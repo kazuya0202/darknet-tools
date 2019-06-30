@@ -1,0 +1,10 @@
+Meryの環境整える
+convert.pyのbase.cfgの部分を消す
+alexeyABのyolov3.cfgをbase.cfgのところにおく
+pythonでyolov3.cfgをdatasets/configの中にコピーする（コピー後は自分でやる - fileterとか）
+README.md書く←
+
+
+### README内
+.convファイルのダウンロード
+その辺の調整はhttps://qiita.com/chimamedia/items/c261a858e1c7b8160af1
