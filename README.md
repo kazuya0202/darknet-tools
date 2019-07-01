@@ -27,7 +27,7 @@ convert.py
 | inflate_images.py  | 画像増幅             |
 |seqrename.sh|画像ファイルの名前を連番にする|
 |startup-script.bat | .py \| .shファイルをD&Dすると自動的にスクリプトを実行 |
-| ffmpeg `<dir>` | 拡張子変換用 |
+| bin `<dir>` | 拡張子変換用など |
 
 > D&D : ドラッグ＆ドロップ
 
@@ -108,7 +108,7 @@ C:.
 
 ### ◆ BBox-Label-Tool.py
 
-1. `datasets` > `Images`に連番にした画像を置く
+1. `datasets/Images`に連番にした画像を置く
 1. `startup-script.bat`にD&D
 1. <a href="https://github.com/puzzledqs/BBox-Label-Tool#bbox-label-tool" target="_blank">BBox-Label-Tool</a>のREADME.mdのように進めていく
 
@@ -118,23 +118,25 @@ C:.
 
 ### ◆ inflate-images.py
 
-1. `startup-script.bat`にD&D
+1. `datasets/classes.txt`にクラスを記述する
 
-   ※ BBox-Label-Tool後、`datasets > Images`, `datasets > Labels`にファイルがある状態で行う
+   ```
+   # classes.txt の内容
+   test
+   est
+   ```
+
+2. `startup-script.bat`にD&D
+
+   ※ BBox-Label-Tool後、`datasets/Images`, `datasets/Labels`にファイルがある状態で行う
 
 <br>
 
 + `datasets`以下に`inflated_labels`, `obj`フォルダが生成される
 
-+ ```
-  # classes.txt の内容
-  test
-  est
-  ```
-
 <br>
 
-<details><summary>ディレクトリ構造（datasets以下）- </summary><div>
+<details><summary>ディレクトリ構造（クリックして展開）</summary><div>
 
 
 ```
@@ -215,25 +217,64 @@ C:.
 
 ## Darknetの実行
 
-+ 学習元データ[darknet53.conv.74](http://pjreddie.com/media/files/darknet53.conv.74) をダウンロードする
++ 学習元データ [darknet53.conv.74](http://pjreddie.com/media/files/darknet53.conv.74) をダウンロードする
 
   ※ ダウンロード済みの場合はスキップ
 
   + ダウンロードしたファイルは`darknet.exe`と同じ階層に置く
 
-+ クローンした`alexeyAB/darknet`内の、`darknet` > `cfg` > `yolov3.cfg`ファイルをコピーして`darknet.exe`と同じ階層に置く
++ クローンした [alexeyAB/darknet](https://github.com/AlexeyAB/darknet) 以下の、`darknet/cfg/yolov3.cfg`ファイルをコピーして`darknet-tools/datasets/config/`に置く（ファイル名は`learning.cfg`）
 
-+ 
+  + 以下のようにファイルを編集する
 
-+ # ここclasses=n, filters=3*(n+5)かく
+  + ```bash
+    ## クラス数が2の場合の例
+    
+    batch=64
+    subdivisions=8
+    max_batches=4000	# classes*2000
+    steps=3200,3600		# max_batches*0.80, max_batches*0.90
+    # ......
+    
+    
+    ## 以下3か所ずつ（filtersはたくさんあるため、classesで検索をかけて見つけること）
+    
+    ## filters: 603行目, 689行目, 776行目
+    ## classes: 610行目, 696行目, 783行目 (2019/7/02 現在)
+    ## クラス数が2の場合、filters=21 / 計算式は後に記述
+    
+    # [convolutional]
+    filters=21	# classesの上にあるfiltersの数値だけ変更
+    
+    # [yolo]
+    classes=2
+    ```
+
+    > + 学習を開始したときに、GPUのメモリの関係でエラーが発生して中断したときは`subdivision`の値を変更する
+    >
+    >   ```bash
+    >   subdivision=16	# next to 8
+    >   subdivision=32	# next to 16
+    >   subdivision=64	# next to 32
+    >   ```
+    >
+    >    <br>
+    >
+    > + `filters`の数値は以下の式で計算する
+    >
+    >   ```bash
+    >   (classes + 5) * 3
+    >   
+    >   # 例
+    >   classes=1  =>  filters=18	# (1+5)*3
+    >   classes=2  =>  filters=21	# (2+5)*3
+    >   ```
 
 + 訓練コマンドを実行する
 
   ```
   .\darknet.exe detector train .\datasets\config\learning.data .\datasets\config\learning.cfg .\darknet53.conv.74
   ```
-
-  
 
 
 
