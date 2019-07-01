@@ -13,6 +13,7 @@
 <br>
 
 <details><summary>ディレクトリ構造（クリックで展開）</summary>
+<div>
 ```
 # 例
 C:.
@@ -56,7 +57,7 @@ C:.
         tsukareta002.jpg
         tsukareta003.jpg
 ```
-</details>
+</div></details>
 
 <br>
 <br>
