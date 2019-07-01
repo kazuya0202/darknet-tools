@@ -32,8 +32,8 @@ rem == inflate ==
 
 	if not errorlevel 0 (call :errOccured)
 
-rem == .sh ==
-) else if %~n1%~x1 == seqrename.sh (
+rem == seqrename ==
+) else if "%~n1%~x1" == "seqrename.sh" (
 	cd seqrename-images/
 	ren *.JPG *.jpg
 	cd ..
@@ -44,12 +44,16 @@ rem == .sh ==
 
 	rem ren .\\seqrename-images\\*.JPG .\\seqrename-images\\*.jpg
 
+rem == .sh ==
+) else if %~x1 == .sh (
+	echo Exec: [bash %~n1%~x1]
+	bash "%~n1%~x1"
+	if not errorlevel 0 (call :errOccured)
+
 rem == not any ==
 ) else (
 	echo This extension is not '.py' or '.sh'.
 	echo Please drag and drop '.py' or '.sh' file.
-	
-	call :normal
 )
 
 echo.
