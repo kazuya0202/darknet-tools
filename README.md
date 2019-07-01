@@ -12,8 +12,8 @@
 <br>
 <br>
 
-<details><summary>ディレクトリ構造（クリックで展開）</summary>
-<div>
+<details><summary>ディレクトリ構造（クリックで展開）</summary><div>
+
 ```
 # 例
 C:.
