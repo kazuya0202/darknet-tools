@@ -22,7 +22,7 @@ for ex in ${extensions[@]}; do
 	# カレントディレクトリだけ
 	for file in `find "./${target_dir}" -maxdepth 1 -type f -name "${ex}"`; do
 		fname=`basename $file | sed 's/\.[^\.]*$//'`
-		ffmpeg -i $file -vcodec copy -threads 4 "${target_dir}/${fname}.jpg" -y && rm $file
+		./ffmpeg/ffmpeg.exe -i $file -vcodec copy -threads 4 "${target_dir}/${fname}.jpg" -y && rm $file
 	done
 done
 
@@ -39,3 +39,4 @@ done
 echo -e "\n** finished renaming."	# message
 
 IFS=$SAVEIFS
+
