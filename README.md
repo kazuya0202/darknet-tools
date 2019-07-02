@@ -100,7 +100,8 @@ C:.
 
 1. `seq-images`フォルダに連番にしたい画像を入れる
 1. `startup-script.bat`にD&D
-1. `> Enter new file name:`にファイル名を入力する
+1. `> Enter new file name:`に新しいファイル名を入力する（XXX001.jpg）  
+  ※ data_001.jpg... としたい場合は、`data_`と入力する
 
 <br>
 
@@ -110,7 +111,7 @@ C:.
 
 1. `datasets/Images`に連番にした画像を置く
 1. `startup-script.bat`にD&D
-1. <a href="https://github.com/puzzledqs/BBox-Label-Tool#bbox-label-tool" target="_blank">BBox-Label-Tool</a>のREADME.mdのように進めていく
+1. <a href="https://github.com/puzzledqs/BBox-Label-Tool#bbox-label-tool" target="_blank">BBox-Label-Tool</a> のREADME.mdのように進めていく
 
 <br>
 
