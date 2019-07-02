@@ -7,6 +7,10 @@ convert.py
 > 存在しなかったらLabelsを参照する的な
 
 
+インストールしておくもの
+> bash
+> Pillow (pip install Pillow)
+
 ```
 
 
@@ -18,16 +22,34 @@ convert.py
   もしくは、`darknet.exe`をリポジトリ内に移動（コピー）する
 
 
+### 必要なもの
++ bash
++ Pillow
+
+***
+
+
+1. Git for Windows のインストール
+  + <a href="https://gitforwindows.org/" target="_blank">https://gitforwindows.org/</a>
+  + 基本的にはデフォルトのままで進めていけばOK
+  > <a href="https://qiita.com/toshi-click/items/dcf3dd48fdc74c91b409">自分用 Git For Windwosのインストール手順 - Qiita</a>
+
+
+1. Python のインストール
+  + 
+
+
+
 
 ### Tools
-| ツール             | 簡単な説明                 |
-| :----              | :----                |
-| BBox-Label-Tool.py | ラベル付け       |
-| convert.py         | 座標をyolo形式に変換 |
-| inflate_images.py  | 画像増幅             |
-|seqrename.sh|画像ファイルの名前を連番にする|
-|startup-script.bat | .py \| .shファイルをD&Dすると自動的にスクリプトを実行 |
-| bin `<dir>` | 拡張子変換用など |
+| ツール               | 簡単な説明                                  |
+| :----              | :----                                      |
+| BBox-Label-Tool.py | ラベル付け                                    |
+| convert.py         | 座標をyolo形式に変換                          |
+| inflate_images.py  | 画像増幅                                    |
+|seqrename.sh        |画像ファイルの名前を連番にする                     |
+|startup-script.bat  | .py \| .shファイルをD&Dすると自動的にスクリプトを実行 |
+| bin `<dir>`        | 拡張子変換用など                              |
 
 > D&D : ドラッグ＆ドロップ
 
@@ -231,7 +253,7 @@ C:.
 
   + ```bash
     ## クラス数が2の場合の例
-    
+
     batch=64
     subdivisions=8
     max_batches=4000	# classes*2000
@@ -278,9 +300,8 @@ C:.
   .\darknet.exe detector train .\datasets\config\learning.data .\datasets\config\learning.cfg .\darknet53.conv.74
   ```
 
-
-
 <br>
+
 
 
 
