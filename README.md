@@ -211,6 +211,7 @@ C:.
 ### ◆ convert.py
 
 1. `startup-script.bat`にD&D
++ `obj`, `inflated_labels`以下のファイルを参照するため現状では、inflate-images.pyを先に実行させておく必要がある
 
 <br>
 
