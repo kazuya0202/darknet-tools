@@ -10,37 +10,47 @@ convert.py
 インストールしておくもの
 > bash
 > Pillow (pip install Pillow)
+@ 操作方法など軽く
+
+@ 必要なものあたりのインデントちゃんとする
 
 ```
 
 
 
 *Description :*
-
++ このリポジトリをcloneして使用する（gitをインストールしていない場合は `セットアップに必要なもの` を参照）
+```
+git clone https://github.com/kazuya0202/darknet-tools.git
+```
 + `darknet.exe`のファイルがある場所にリポジトリ内のファイルを置く
 
   もしくは、`darknet.exe`をリポジトリ内に移動（コピー）する
 
 
-### 必要なもの
+### セットアップに必要なもの
 + bash
 + Pillow
 
-
+<br>
 
 1. Git for Windows のインストール
-  + <a href="https://gitforwindows.org/" target="_blank">https://gitforwindows.org/</a>
+
   + 基本的にはデフォルトのままで進めていけばOK
-  > 参考：<a href="https://qiita.com/toshi-click/items/dcf3dd48fdc74c91b409">自分用 Git For Windwosのインストール手順 - Qiita</a>
+  > 公式：<a href="https://gitforwindows.org/" target="_blank">https://gitforwindows.org/</a>  
+  > 参考：<a href="https://qiita.com/toshi-click/items/dcf3dd48fdc74c91b409" target="_blank">自分用 Git For Windwosのインストール手順 - Qiita</a>
   <br>
   + Gitインストール先`{~}/Git/bin`を環境変数のパスに設定する
   + コマンドプロンプトを開いて`bash`を実行する
   > ※ このとき`'bash'は、内部コマンドまたは外部コマンド ...`と出力された場合は、コマンドプロンプトを再起動、パスの確認などをする
 
+<br>
+<br>
 
 1. Python のインストール
-  + <a href="https://www.python.org/">https://www.python.org/</a>
-  + 参考：<a href="https://www.python.jp/install/windows/install_py3.html">Python3のインストール - python.jp</a>
+
+  > 公式：<a href="https://www.python.org/" target="_blank">https://www.python.org/</a>  
+  > 参考：<a href="https://www.python.jp/install/windows/install_py3.html" target="_blank">Python3のインストール - python.jp</a>
   <br>
   + 環境変数に`{~}/PythonXX/`, `{~}/PythonXX/Scripts/`が設定されているかどうか確認する
   <br>
@@ -58,7 +68,7 @@ convert.py
 | BBox-Label-Tool.py | ラベル付け                                    |
 | convert.py         | 座標をyolo形式に変換                          |
 | inflate_images.py  | 画像増幅                                    |
-|seqrename.sh        |画像ファイルの名前を連番にする                     |
+|seqrename.sh        | 画像ファイルの名前を連番にする                     |
 |startup-script.bat  | .py \| .shファイルをD&Dすると自動的にスクリプトを実行 |
 | bin `<dir>`        | 拡張子変換用など                              |
 
@@ -68,8 +78,6 @@ convert.py
 <br>
 
 <details><summary>クローン時のディレクトリ構造（クリックして展開）</summary><div>
-
-
 
 ```
 # ~\darknet-tools\
@@ -171,7 +179,6 @@ C:.
 <br>
 
 <details><summary>ディレクトリ構造（クリックして展開）</summary><div>
-
 
 ```
 # ~\darknet-tools\datasets\
