@@ -26,23 +26,34 @@ convert.py
 + bash
 + Pillow
 
-***
 
 
 1. Git for Windows のインストール
   + <a href="https://gitforwindows.org/" target="_blank">https://gitforwindows.org/</a>
   + 基本的にはデフォルトのままで進めていけばOK
-  > <a href="https://qiita.com/toshi-click/items/dcf3dd48fdc74c91b409">自分用 Git For Windwosのインストール手順 - Qiita</a>
+  > 参考：<a href="https://qiita.com/toshi-click/items/dcf3dd48fdc74c91b409">自分用 Git For Windwosのインストール手順 - Qiita</a>
+  <br>
+  + Gitインストール先`{~}/Git/bin`を環境変数のパスに設定する
+  + コマンドプロンプトを開いて`bash`を実行する
+  > ※ このとき`'bash'は、内部コマンドまたは外部コマンド ...`と出力された場合は、コマンドプロンプトを再起動、パスの確認などをする
 
 
 1. Python のインストール
-  + 
+  + <a href="https://www.python.org/">https://www.python.org/</a>
+  + 参考：<a href="https://www.python.jp/install/windows/install_py3.html">Python3のインストール - python.jp</a>
+  <br>
+  + 環境変数に`{~}/PythonXX/`, `{~}/PythonXX/Scripts/`が設定されているかどうか確認する
+  <br>
+  + コマンドプロンプトを開いて`python --version`, `pip --version`を実行してバージョンが出力されることを確認する（Python2をインストールしている場合は、`python`→`python3` / `pip`→`pip3`を用いる）
+  + Pillowをインストールする
+    `pip install Pillow`　or `pip3 install Pillow`
+  
 
 
 
 
 ### Tools
-| ツール               | 簡単な説明                                  |
+| ツール              | 簡単な説明                                  |
 | :----              | :----                                      |
 | BBox-Label-Tool.py | ラベル付け                                    |
 | convert.py         | 座標をyolo形式に変換                          |
