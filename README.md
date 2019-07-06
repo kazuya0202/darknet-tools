@@ -1,80 +1,69 @@
 # Darknet データセット作成ツール
 
-```
-# <MEMO>
-convert.py
-> 入力ファイルが`inflated_labelsだけを参照するのはどうにかすべき？
-> 存在しなかったらLabelsを参照する的な
-
-
-インストールしておくもの
-> bash
-> Pillow (pip install Pillow)
-@ 操作方法など軽く
-
-@ 必要なものあたりのインデントちゃんとする
-
-```
-
-
-
 *Description :*
-+ このリポジトリをcloneして使用する（gitをインストールしていない場合は `セットアップに必要なもの` を参照）
-```
-git clone https://github.com/kazuya0202/darknet-tools.git
-```
+
 + `darknet.exe`のファイルがある場所にリポジトリ内のファイルを置く
++ もしくは、`darknet.exe`をリポジトリ内に移動（コピー）する
 
-  もしくは、`darknet.exe`をリポジトリ内に移動（コピー）する
+<br>
 
+### Tools
 
-### セットアップに必要なもの
+| ツール             | 簡単な説明                     |
+| :----------------- | :----------------------------- |
+| BBox-Label-Tool.py | ラベル付け                     |
+| convert.py         | 座標をyolo形式に変換           |
+| inflate_images.py  | 画像増幅                       |
+| seqrename.py       | 画像ファイルの名前を連番にする |
+| bin `<dir>`        | 拡張子変換用など               |
+
+<br>
+
+### 実行に必要なもの
+
+※ インストールしている場合はスキップ
+
 + bash
++ Python
 + Pillow
 
 <br>
 
 1. Git for Windows のインストール
 
-  + 基本的にはデフォルトのままで進めていけばOK
-  > 公式：<a href="https://gitforwindows.org/" target="_blank">https://gitforwindows.org/</a>  
-  > 参考：<a href="https://qiita.com/toshi-click/items/dcf3dd48fdc74c91b409" target="_blank">自分用 Git For Windwosのインストール手順 - Qiita</a>
-  <br>
-  + Gitインストール先`{~}/Git/bin`を環境変数のパスに設定する
-  + コマンドプロンプトを開いて`bash`を実行する
-  > ※ このとき`'bash'は、内部コマンドまたは外部コマンド ...`と出力された場合は、コマンドプロンプトを再起動、パスの確認などをする
-
-<br>
-<br>
-
-1. Python のインストール
-
-  > 公式：<a href="https://www.python.org/" target="_blank">https://www.python.org/</a>  
-  > 参考：<a href="https://www.python.jp/install/windows/install_py3.html" target="_blank">Python3のインストール - python.jp</a>
-  <br>
-  + 環境変数に`{~}/PythonXX/`, `{~}/PythonXX/Scripts/`が設定されているかどうか確認する
-  <br>
-  + コマンドプロンプトを開いて`python --version`, `pip --version`を実行してバージョンが出力されることを確認する（Python2をインストールしている場合は、`python`→`python3` / `pip`→`pip3`を用いる）
-  + Pillowをインストールする
-    `pip install Pillow`　or `pip3 install Pillow`
-  
+   > + 基本的にはデフォルトのままで進めていけばOK
+   >
+   > 公式：https://gitforwindows.org/  
+   > 参考：[自分用 Git For Windwosのインストール手順 - Qiita](https://qiita.com/toshi-click/items/dcf3dd48fdc74c91b409)
+   >
+   > <br>
+   >
+   > + Gitインストール先`{~}/Git/bin`を環境変数のパスに設定する
+   >
+   > + コマンドプロンプトを開いて`bash`を実行できるか確認する
+   >
+   >   ※ このとき`'bash'は、内部コマンドまたは外部コマンド ...`と出力された場合は、コマンドプロンプトを再起動、パスの確認などをする
 
 
 
+Python のインストール
 
-### Tools
-| ツール              | 簡単な説明                                  |
-| :----              | :----                                      |
-| BBox-Label-Tool.py | ラベル付け                                    |
-| convert.py         | 座標をyolo形式に変換                          |
-| inflate_images.py  | 画像増幅                                    |
-|seqrename.sh        | 画像ファイルの名前を連番にする                     |
-|startup-script.bat  | .py \| .shファイルをD&Dすると自動的にスクリプトを実行 |
-| bin `<dir>`        | 拡張子変換用など                              |
+1. > 公式：<a href="https://www.python.org/" target="_blank">https://www.python.org/</a>  
+   > 参考：<a href="https://www.python.jp/install/windows/install_py3.html" target="_blank">Python3のインストール - python.jp</a>
+   >   <br>
+   >
+   > - 環境変数に`{~}/PythonXX/`, `{~}/PythonXX/Scripts/`が設定されているかどうか確認する
+   >
+   > - コマンドプロンプトを開いて`python --version`, `pip --version`を実行してバージョンが出力されることを確認する
+   >
+   >   - Python2をインストールしている場合は、`python`→`python3` / `pip`→`pip3`を用いる
+   >
+   > - Pillowをインストールする
+   >
+   >   ```
+   >   pip install Pillow
+   >   ```
 
-> D&D : ドラッグ＆ドロップ
-
-<br>
 <br>
 
 <details><summary>クローン時のディレクトリ構造（クリックして展開）</summary><div>
@@ -141,12 +130,12 @@ C:.
 
 1. `seq-images`フォルダに連番にしたい画像を入れる
 1. `startup-script.bat`にD&D
-1. `> Enter new file name:`に新しいファイル名を入力する（XXX001.jpg）  
-  ※ data_001.jpg... としたい場合は、`data_`と入力する
+1. `> Enter new file name:`に新しいファイル名を入力する（XXX001.jpg）
+     ※ data_001.jpg... としたい場合は、`data_`と入力する
 
 <br>
 
-***
+<br>
 
 ### ◆ BBox-Label-Tool.py
 
@@ -156,9 +145,11 @@ C:.
 
 <br>
 
-***
+<br>
 
 ### ◆ inflate-images.py
+
+※ 画像の増幅を行わない場合はスキップ
 
 1. `datasets/classes.txt`にクラスを記述する
 
@@ -171,8 +162,6 @@ C:.
 2. `startup-script.bat`にD&D
 
    ※ BBox-Label-Tool後、`datasets/Images`, `datasets/Labels`にファイルがある状態で行う
-
-<br>
 
 + `datasets`以下に`inflated_labels`, `obj`フォルダが生成される
 
@@ -246,7 +235,7 @@ C:.
 
 <br>
 
-***
+<br>
 
 ### ◆ convert.py
 
@@ -265,7 +254,7 @@ C:.
 
   + ダウンロードしたファイルは`darknet.exe`と同じ階層に置く
 
-+ クローンした [alexeyAB/darknet](https://github.com/AlexeyAB/darknet) 以下の、`darknet/cfg/yolov3.cfg`ファイルをコピーして`darknet-tools/datasets/config/`に置く（ファイル名は`learning.cfg`）
++ クローンした <a href="https://github.com/AlexeyAB/darknet" target="_blank">alexeyAB/darknet</a> の、`darknet/cfg/yolov3.cfg`ファイルをコピーして`darknet-tools/datasets/config/`に置く（ファイル名は`learning.cfg`）
 
   + 以下のようにファイルを編集する
 
@@ -317,6 +306,16 @@ C:.
   ```
   .\darknet.exe detector train .\datasets\config\learning.data .\datasets\config\learning.cfg .\darknet53.conv.74
   ```
+
+<br>
+
++ 学習を再開させる場合、weightファイルを指定する
+
+  ```
+  .\darknet.exe detector train .\datasets\config\learning.data .\datasets\config\learning.cfg .\datasets\config\backup\learning_last.weight
+  ```
+
+  
 
 <br>
 

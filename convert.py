@@ -8,7 +8,6 @@ import time
 from os import walk, getcwd
 from PIL import Image
 
-# ここに分類するクラスを記述する。
 classes = []
 
 def create_config(data_dir, train_ratio):
@@ -53,20 +52,20 @@ def create_config(data_dir, train_ratio):
         names_config.write("{0}\n".format(i))
     names_config.close()
 
-    base_config = open("base.cfg", "r")
+    # base_config = open("base.cfg", "r")
     # new_config = open("{0}/darknet_data/config/learning.cfg".format(data_dir), "w")
-    new_config = open("{0}/config/learning.cfg".format(data_dir), "w")
+    # new_config = open("{0}/config/learning.cfg".format(data_dir), "w")
 
-    for line in base_config.readlines():
-        if line.find("$FILTERS_NUM") != -1:
-            filter_num = 5 * (len(classes) + 4 + 1)
-            new_config.write("filters={0}\n".format(filter_num))
-        elif line.find("classes") != -1:
-            new_config.write("classes={0}\n".format(len(classes)))
-        else:
-            new_config.write(line)
-    base_config.close()
-    new_config.close()
+    # for line in base_config.readlines():
+    #     if line.find("$FILTERS_NUM") != -1:
+    #         filter_num = 5 * (len(classes) + 4 + 1)
+    #         new_config.write("filters={0}\n".format(filter_num))
+    #     elif line.find("classes") != -1:
+    #         new_config.write("classes={0}\n".format(len(classes)))
+    #     else:
+    #         new_config.write(line)
+    # base_config.close()
+    # new_config.close()
     
 
 
@@ -86,13 +85,28 @@ def convert(size, box):
     return (x,y,w,h)
 
 def main(data_dir, obj_dir):
+    is_not_inflated = False # inflated-imagesを実行したかどうか
+    seq = 1 # フォルダ連番用
+    
     # 分類クラス分繰り返す
     for cls in classes:
-    	
+        is_not_inflated = False # 増幅していない
         # labelデータ input path
         mypath = "{0}/inflated_labels/{1}/".format(data_dir, cls)
+
+        # クラスごとに、増幅後のフォルダが存在しているかどうか
+        if not os.path.exists(f'{data_dir}/inflated_labels/{cls}'):
+            # パスを変更
+            mypath = f'{data_dir}/Labels/{str(seq).zfill(3)}/'
+            seq += 1                # 連番を増やす
+            is_not_inflated = True  # 増幅していない
+
         # labelデータ output path
         outpath = "{0}/{1}/{2}/".format(data_dir, obj_dir, cls)
+
+        # {cls}フォルダが存在しないなら作成
+        if not os.path.exists(f'{data_dir}/{obj_dir}/{cls}'):
+            os.makedirs(f'{data_dir}/{obj_dir}/{cls}')
     
         wd = getcwd()
         cls_id = classes.index(cls)
@@ -137,6 +151,11 @@ def main(data_dir, obj_dir):
                     ymax = elems[3]
                     # img_path = str('%s/%s/inflated_images/%s/%s.jpg'%(wd, data_dir, cls, os.path.splitext(txt_name)[0]))
                     img_path = str('%s/%s/%s/%s.jpg'%(data_dir, obj_dir, cls, os.path.splitext(txt_name)[0]))
+
+                    # 増幅していないならBBox用のファイルを参照
+                    if is_not_inflated:
+                        img_path = f'{data_dir}/Images/{str(seq - 1).zfill(3)}/{os.path.splitext(txt_name)[0]}.jpg'
+                        
                     im=Image.open(img_path)
                     w= int(im.size[0])
                     h= int(im.size[1])
@@ -146,8 +165,13 @@ def main(data_dir, obj_dir):
     
             if(ct != 0):
                 # list_file.write('%s/inflated_images/%s/%s.jpg\n'%(wd, cls, os.path.splitext(txt_name)[0]))
-                list_file.write('%s/%s/%s/%s.jpg\n'%(data_dir, obj_dir, cls, os.path.splitext(txt_name)[0]))
-    
+
+                # ファイルを書き込む
+                if is_not_inflated:
+                    list_file.write(f'{data_dir}/Images/{str(seq - 1).zfill(3)}/{os.path.splitext(txt_name)[0]}.jpg\n')
+                else:
+                    list_file.write('%s/%s/%s/%s.jpg\n'%(data_dir, obj_dir, cls, os.path.splitext(txt_name)[0]))
+
         list_file.close()
     
 if __name__ == '__main__':
