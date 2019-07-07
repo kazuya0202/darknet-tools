@@ -1,5 +1,0 @@
-classes = 2
-train = datasets/config/train.txt
-valid = datasets/config/valid.txt
-names = datasets/config/learning.names
-backup = backup

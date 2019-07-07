@@ -11,9 +11,13 @@ target_dir='seqrename-images'
 # ファイル名が同じで拡張子だけが違う場合にファイルが消る可能性があるため
 for file in `find "./${target_dir}" -maxdepth 1 -type f -name "*"`; do
 	count=$(expr $count + 1)	# インクリメント
-	fname="EX9brx6MAZ`printf %03d ${count}`"	# 0埋め3桁 / 連結
+	fname="EX9brx6MAZN`printf %03d ${count}`"	# 0埋め3桁 / 連結
+	ex=`echo $file | sed 's/^.*\.\([^\.]*\)$/\1/'`
 
-	mv $file "${target_dir}/${fname}.jpg"	# ファイル名変更
+	if [ "${file}" != "${fname}.${ex}" ]; then
+		# ファイル名変更
+		mv $file "${target_dir}/${fname}.${ex}"
+	fi
 done
 
 count=0
@@ -24,7 +28,7 @@ declare -a extensions=(	# 変更する拡張子
 	"*.JPEG"
 	"*.gif"
 	"*.GIF"
-	)
+)
 
 # extensionsの要素がある間
 for ex in ${extensions[@]}; do
@@ -35,6 +39,15 @@ for ex in ${extensions[@]}; do
 	done
 done
 
+# JPG to jpg
+for file in `find "./${target_dir}" -maxdepth 1 -type f -name "*.JPG"`; do
+	# 大文字をすべて小文字に
+	new=`echo $file | tr '[:upper:]' '[:lower:]'`
+	mv "$file" "$new"
+done
+
+
+
 # 入力
 [ $1 ] && name=$1 || read -p "> Enter new file name: " name
 
@@ -44,6 +57,7 @@ for file in `find "./${target_dir}" -maxdepth 1 -type f -name "*.jpg"`; do
 
 	mv $file "${target_dir}/${fname}.jpg"	# ファイル名変更
 done
+
 
 echo -e "\n** finished renaming."	# message
 

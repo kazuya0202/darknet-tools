@@ -14,7 +14,7 @@
 | BBox-Label-Tool.py | ラベル付け                     |
 | convert.py         | 座標をyolo形式に変換           |
 | inflate_images.py  | 画像増幅                       |
-| seqrename.py       | 画像ファイルの名前を連番にする |
+| seqrename.sh       | 画像ファイルの名前を連番にする |
 | bin `<dir>`        | 拡張子変換用など               |
 
 <br>
@@ -40,7 +40,7 @@
    >
    > + Gitインストール先`{~}/Git/bin`を環境変数のパスに設定する
    >
-   > + コマンドプロンプトを開いて`bash`を実行できるか確認する
+   > + コマンドプロンプトを開いて`bash --help`を実行できるか確認する
    >
    >   ※ このとき`'bash'は、内部コマンドまたは外部コマンド ...`と出力された場合は、コマンドプロンプトを再起動、パスの確認などをする
 
@@ -66,7 +66,12 @@ Python のインストール
 
 <br>
 
-<details><summary>クローン時のディレクトリ構造（クリックして展開）</summary><div>
+<br>
+
+### ディレクトリ構造
+
+<details><summary>クローン時（クリックして展開）</summary><div>
+
 
 ```
 # ~\darknet-tools\
@@ -74,15 +79,15 @@ Python のインストール
 C:.
 │  darknet.exe
 │  ...
-│  base.cfg
 │  BBox-Label-Tool.py
 │  convert.py
-│  ffmpeg.exe
 │  inflate_images.py
 │  README.md
 │  seqrename.sh
-│  startup-script.bat
 │  
+├─bin
+│      ffmpeg.exe
+│
 ├─datasets
 │  │  classes.txt
 │  │  
@@ -108,9 +113,6 @@ C:.
 │              est2.txt
 │              est3.txt
 │
-├─bin
-│      ffmpeg.exe
-│
 └─seqrename-images
         hoge_001.jpg
         hoge_002.jpg
@@ -123,15 +125,39 @@ C:.
 
 ## 実行手順 / 使い方
 
+※ コマンドプロンプト / bash で実行する
+
+
+
 
 ### ◆ seqrename.sh
 
 ※ すでに連番である場合は実行しなくてよい  
 
 1. `seq-images`フォルダに連番にしたい画像を入れる
-1. `startup-script.bat`にD&D
-1. `> Enter new file name:`に新しいファイル名を入力する（XXX001.jpg）
+
+1. 以下を実行する
+
+     ```
+     bash seqrename.sh
+     ```
+
+1. `> Enter new file name:`に新しいファイル名を入力する
      ※ data_001.jpg... としたい場合は、`data_`と入力する
+
+
+
++ 実行時に引数を1つ追加すると引数の文字列がファイル名になる
+
+  ```
+  bash seqrename.sh newgame
+  ```
+
+  > newgame001.jpg
+  >
+  > newgame002.jpg
+  >
+  > ...
 
 <br>
 
@@ -140,14 +166,22 @@ C:.
 ### ◆ BBox-Label-Tool.py
 
 1. `datasets/Images`に連番にした画像を置く
-1. `startup-script.bat`にD&D
+
+   + seqrename.sh を使った場合は`seqrename-images`から移動する
+
+1. 以下を実行する（引数にはフォルダ名を指定）
+
+   ```
+   python BBox-Label-Tool.py datasets
+   ```
+
 1. <a href="https://github.com/puzzledqs/BBox-Label-Tool#bbox-label-tool" target="_blank">BBox-Label-Tool</a> のREADME.mdのように進めていく
 
 <br>
 
 <br>
 
-### ◆ inflate-images.py
+### ◆ inflate_images.py
 
 ※ 画像の増幅を行わない場合はスキップ
 
@@ -159,8 +193,12 @@ C:.
    est
    ```
 
-2. `startup-script.bat`にD&D
+2. 以下を実行する（引数にはフォルダ名を指定）
 
+   ```
+   python imflate-images.py datasets
+   ```
+   
    ※ BBox-Label-Tool後、`datasets/Images`, `datasets/Labels`にファイルがある状態で行う
 
 + `datasets`以下に`inflated_labels`, `obj`フォルダが生成される
@@ -191,16 +229,12 @@ C:.
 │  │      test2_0.txt
 │  │      test2_1.txt
 │  │      test2_2.txt
-│  │      test2_3.txt
-│  │      test2_4.txt
 │  │      ...
 │  │
 │  └─est
 │          est2_0.txt
 │          est2_1.txt
 │          est2_2.txt
-│          est2_3.txt
-│          est2_4.txt
 │          ...
 │
 ├─Labels
@@ -219,16 +253,12 @@ C:.
     │      test2_0.jpg
     │      test2_1.jpg
     │      test2_2.jpg
-    │      test2_3.jpg
-    │      test2_4.jpg
     │      ...
     │
     └─est
             est2_0.jpg
             est2_1.jpg
             est2_2.jpg
-            est2_3.jpg
-            est2_4.jpg
             ...
 ```
 </div></details>
@@ -239,8 +269,25 @@ C:.
 
 ### ◆ convert.py
 
-1. `startup-script.bat`にD&D
-+ `obj`, `inflated_labels`以下のファイルを参照するため現状では、inflate-images.pyを先に実行させておく必要がある
+1. 以下を実行する
+
+   ```
+   python convert.py datasets
+   ```
+
+   + inflate_images.py を実行した場合は、以下をのフォルダを参照する
+
+     ```
+     ./datasets/inflated-labels/		# ラベル
+     ./datasets/obj/{クラス名}/		 # 画像
+     ```
+
+   + 実行しなかった場合は、以下のフォルダを参照する
+
+     ```
+     ./datasets/Labels/	# ラベル
+     ./datasets/Images/	# 画像
+     ```
 
 <br>
 
@@ -248,74 +295,71 @@ C:.
 
 ## Darknetの実行
 
-+ 学習元データ [darknet53.conv.74](http://pjreddie.com/media/files/darknet53.conv.74) をダウンロードする
+1. 学習元データ [darknet53.conv.74](http://pjreddie.com/media/files/darknet53.conv.74) をダウンロードする
 
-  ※ ダウンロード済みの場合はスキップ
+   ※ ダウンロード済み、または既に学習を始めている場合はスキップ
 
-  + ダウンロードしたファイルは`darknet.exe`と同じ階層に置く
+   + ダウンロードしたファイルは`darknet.exe`と同じ階層に置く
+   + クローンした <a href="https://github.com/AlexeyAB/darknet" target="_blank">alexeyAB/darknet</a> の、`darknet/cfg/yolov3.cfg`ファイルをコピーして`darknet-tools/datasets/config/`に置く（ファイル名は`learning.cfg`）
 
-+ クローンした <a href="https://github.com/AlexeyAB/darknet" target="_blank">alexeyAB/darknet</a> の、`darknet/cfg/yolov3.cfg`ファイルをコピーして`darknet-tools/datasets/config/`に置く（ファイル名は`learning.cfg`）
+2. 以下のようにファイルを編集する
 
-  + 以下のようにファイルを編集する
+   ```bash
+   ## クラス数が2の場合の例
+   
+   batch=64
+   subdivisions=8
+   max_batches=4000	# classes*2000
+   steps=3200,3600		# max_batches*0.80, max_batches*0.90
+   # ......
+   
+   
+   ## 以下3か所ずつ（filtersはたくさんあるため、classesで検索をかけて見つけること）
+   
+   ## filters: 603行目, 689行目, 776行目
+   ## classes: 610行目, 696行目, 783行目 (2019/7/02 現在)
+   ## クラス数が2の場合、filters=21 / 計算式は後に記述
+   
+   # [convolutional]
+   filters=21	# classesの上にあるfiltersの数値だけ変更
+   
+   # [yolo]
+   classes=2
+   ```
 
-  + ```bash
-    ## クラス数が2の場合の例
+   > - 学習を開始したときに、GPUのメモリの関係でエラーが発生して中断したときは`subdivision`の値を変更する
+   >
+   > ```bash
+   > subdivision=16	# next to 8
+   > subdivision=32	# next to 16
+   > subdivision=64	# next to 32
+   > ```
+   >
+   > <br>
+   >
+   > + `filters`の数値は以下の式で計算する
+   >
+   > ```bash
+   > (classes + 5) * 3
+   > 
+   > # 例
+   > classes=1  =>  filters=18	# (1+5)*3
+   > classes=2  =>  filters=21	# (2+5)*3
+   > ```
 
-    batch=64
-    subdivisions=8
-    max_batches=4000	# classes*2000
-    steps=3200,3600		# max_batches*0.80, max_batches*0.90
-    # ......
-    
-    
-    ## 以下3か所ずつ（filtersはたくさんあるため、classesで検索をかけて見つけること）
-    
-    ## filters: 603行目, 689行目, 776行目
-    ## classes: 610行目, 696行目, 783行目 (2019/7/02 現在)
-    ## クラス数が2の場合、filters=21 / 計算式は後に記述
-    
-    # [convolutional]
-    filters=21	# classesの上にあるfiltersの数値だけ変更
-    
-    # [yolo]
-    classes=2
-    ```
+3. 訓練コマンドを実行する
 
-    > + 学習を開始したときに、GPUのメモリの関係でエラーが発生して中断したときは`subdivision`の値を変更する
-    >
-    >   ```bash
-    >   subdivision=16	# next to 8
-    >   subdivision=32	# next to 16
-    >   subdivision=64	# next to 32
-    >   ```
-    >
-    >    <br>
-    >
-    > + `filters`の数値は以下の式で計算する
-    >
-    >   ```bash
-    >   (classes + 5) * 3
-    >   
-    >   # 例
-    >   classes=1  =>  filters=18	# (1+5)*3
-    >   classes=2  =>  filters=21	# (2+5)*3
-    >   ```
+   ```
+   .\darknet.exe detector train .\datasets\config\learning.data .\datasets\config\learning.cfg .\darknet53.conv.74
+   ```
 
-+ 訓練コマンドを実行する
+4. 学習を再開させる場合、weightsファイルを指定する
 
-  ```
-  .\darknet.exe detector train .\datasets\config\learning.data .\datasets\config\learning.cfg .\darknet53.conv.74
-  ```
+   ```
+   .\darknet.exe detector train .\datasets\config\learning.data .\datasets\config\learning.cfg .\datasets\config\backup\learning_last.weights
+   ```
 
-<br>
 
-+ 学習を再開させる場合、weightファイルを指定する
-
-  ```
-  .\darknet.exe detector train .\datasets\config\learning.data .\datasets\config\learning.cfg .\datasets\config\backup\learning_last.weight
-  ```
-
-  
 
 <br>
 

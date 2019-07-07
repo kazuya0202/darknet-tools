@@ -1,6 +1,0 @@
-datasets/Images/001/test.jpg
-datasets/Images/001/test2.jpg
-datasets/Images/001/test3.jpg
-datasets/Images/002/est.jpg
-datasets/Images/002/est2.jpg
-datasets/Images/002/est3.jpg
