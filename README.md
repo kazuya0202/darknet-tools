@@ -302,13 +302,15 @@ C:.
    + ダウンロードしたファイルは`darknet.exe`と同じ階層に置く
    + クローンした <a href="https://github.com/AlexeyAB/darknet" target="_blank">alexeyAB/darknet</a> の、`darknet/cfg/yolov3.cfg`ファイルをコピーして`darknet-tools/datasets/config/`に置く（ファイル名は`learning.cfg`）
 
+   <br>
+
 2. 以下のようにファイルを編集する
 
    ```bash
    ## クラス数が2の場合の例
    
-   batch=64
-   subdivisions=8
+   batch=64		# ※1
+   subdivisions=8	# ※2
    max_batches=4000	# classes*2000
    steps=3200,3600		# max_batches*0.80, max_batches*0.90
    # ......
@@ -321,31 +323,46 @@ C:.
    ## クラス数が2の場合、filters=21 / 計算式は後に記述
    
    # [convolutional]
-   filters=21	# classesの上にあるfiltersの数値だけ変更
+   # classesの上にあるfiltersの数値だけ変更
+   filters=21		# ※3
    
    # [yolo]
    classes=2
    ```
 
-   > - 学習を開始したときに、GPUのメモリの関係でエラーが発生して中断したときは`subdivision`の値を変更する
+   ※1：`batch=XX`はデータセットのサイズに応じて変更する（XXには2のn乗の値 `32, 64, 128, 256, 512, 1024, 2048` が使われることが多い）
+
+   > サイズ：	数百件 => 32 / 64 ...
    >
-   > ```bash
-   > subdivision=16	# next to 8
-   > subdivision=32	# next to 16
-   > subdivision=64	# next to 32
-   > ```
+   > ​					数千件 => 128 / 256 ...
    >
-   > <br>
+   > ​					数万件 => 1024 / 2048 ...
    >
-   > + `filters`の数値は以下の式で計算する
-   >
-   > ```bash
-   > (classes + 5) * 3
-   > 
-   > # 例
-   > classes=1  =>  filters=18	# (1+5)*3
-   > classes=2  =>  filters=21	# (2+5)*3
-   > ```
+   > 学習がうまくいっておらず、ほかに調整するパラメータがなくなったときはこのバッチサイズを大きくしたり小さくしたりするとよい
+
+   <br>
+
+   ※2：学習を開始したときに、GPUのメモリの関係でエラーが発生して中断したときは`subdivision`の値を変更する
+
+   ```bash
+   subdivision=16	# next to 8
+   subdivision=32	# next to 16
+   subdivision=64	# next to 32
+   ```
+
+   <br>
+
+   ※3：`filters`の数値は以下の式で計算する
+
+   ```bash
+   (classes + 5) * 3
+   
+   # 例
+   classes=1  >>  filters=18	# (1+5)*3
+   classes=2  >>  filters=21	# (2+5)*3
+   ```
+
+   <br>
 
 3. 訓練コマンドを実行する
 
@@ -353,13 +370,13 @@ C:.
    .\darknet.exe detector train .\datasets\config\learning.data .\datasets\config\learning.cfg .\darknet53.conv.74
    ```
 
+   <br>
+
 4. 学習を再開させる場合、weightsファイルを指定する
 
    ```
    .\darknet.exe detector train .\datasets\config\learning.data .\datasets\config\learning.cfg .\datasets\config\backup\learning_last.weights
    ```
-
-
 
 <br>
 
