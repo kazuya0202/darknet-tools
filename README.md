@@ -3,68 +3,39 @@
 *Description :*
 
 + `darknet.exe`のファイルがある場所にリポジトリ内のファイルを置く
-+ もしくは、`darknet.exe`をリポジトリ内に移動（コピー）する
 
 <br>
 
 ### Tools
 
-| ツール             | 簡単な説明                     |
+| ツール             | 説明                           |
 | :----------------- | :----------------------------- |
-| BBox-Label-Tool.py | ラベル付け                     |
-| convert.py         | 座標をyolo形式に変換           |
+| BBox-Label-Tool.py | アノテーション                 |
+| convert.py         | BBox から yoloに変換           |
 | inflate_images.py  | 画像増幅                       |
-| seqrename.sh       | 画像ファイルの名前を連番にする |
+| seqren.exe         | 画像ファイルの名前を連番にする |
+| tojpg.sh           | 画像の拡張子を`jpg`に変換する  |
 | bin `<dir>`        | 拡張子変換用など               |
 
 <br>
 
 ### 実行に必要なもの
 
-※ インストールしている場合はスキップ
-
-+ bash
-+ Python
-+ Pillow
++ python
++ (bash)
 
 <br>
 
-1. Git for Windows のインストール
++ python のインストール
 
-   > + 基本的にはデフォルトのままで進めていけばOK
-   >
-   > 公式：https://gitforwindows.org/  
-   > 参考：[自分用 Git For Windwosのインストール手順 - Qiita](https://qiita.com/toshi-click/items/dcf3dd48fdc74c91b409)
-   >
-   > <br>
-   >
-   > + Gitインストール先`{~}/Git/bin`を環境変数のパスに設定する
-   >
-   > + コマンドプロンプトを開いて`bash --help`を実行できるか確認する
-   >
-   >   ※ このとき`'bash'は、内部コマンドまたは外部コマンド ...`と出力された場合は、コマンドプロンプトを再起動、パスの確認などをする
+>  公式：<a href="https://www.python.org/" target="_blank">https://www.python.org/</a>  
+> 参考：<a href="https://www.python.jp/install/windows/install_py3.html" target="_blank">Python3のインストール - python.jp</a>
 
+インストール後
 
-
-Python のインストール
-
-1. > 公式：<a href="https://www.python.org/" target="_blank">https://www.python.org/</a>  
-   > 参考：<a href="https://www.python.jp/install/windows/install_py3.html" target="_blank">Python3のインストール - python.jp</a>
-   >   <br>
-   >
-   > - 環境変数に`{~}/PythonXX/`, `{~}/PythonXX/Scripts/`が設定されているかどうか確認する
-   >
-   > - コマンドプロンプトを開いて`python --version`, `pip --version`を実行してバージョンが出力されることを確認する
-   >
-   >   - Python2をインストールしている場合は、`python`→`python3` / `pip`→`pip3`を用いる
-   >
-   > - Pillowをインストールする
-   >
-   >   ```
-   >   pip install Pillow
-   >   ```
-
-<br>
+```bash
+$ pip install -r requirements.txt
+```
 
 <br>
 
@@ -77,13 +48,11 @@ Python のインストール
 # ~\darknet-tools\
 
 C:.
-│  darknet.exe
-│  ...
 │  BBox-Label-Tool.py
 │  convert.py
 │  inflate_images.py
 │  README.md
-│  seqrename.sh
+│  seqren.exe
 │  
 ├─bin
 │      ffmpeg.exe
@@ -121,45 +90,63 @@ C:.
 </div></details>
 
 <br>
-<br>
 
 ## 実行手順 / 使い方
 
 ※ コマンドプロンプト / bash で実行する
 
 
+### ◆ seqren.exe
 
+※ すでに連番である場合、または連番にしない場合は実行しなくてよい
 
-### ◆ seqrename.sh
-
-※ すでに連番である場合は実行しなくてよい  
-
-1. `seq-images`フォルダに連番にしたい画像を入れる
+1. 連番にしたいファイルを任意のフォルダにまとめる
 
 1. 以下を実行する
 
+     ```bash
+     $ ./seqren.exe -p {ファイルをまとめたフォルダ}
      ```
-     bash seqrename.sh
-     ```
 
-1. `> Enter new file name:`に新しいファイル名を入力する
-     ※ data_001.jpg... としたい場合は、`data_`と入力する
-
-
-
-+ 実行時に引数を1つ追加すると引数の文字列がファイル名になる
-
-  ```
-  bash seqrename.sh newgame
-  ```
-
-  > newgame001.jpg
-  >
-  > newgame002.jpg
-  >
-  > ...
+     1. `Enter the filename: `に変更後のファイル名を入力する
+     2. 確認してOKなら`実行しますか? (y/n): `に`y`を入力する
 
 <br>
+
++ ファイル名や連番の桁数を指定する場合の詳細
+
+```bash
+$ ./seqren.exe --help
+ファイル名を連番にリネームします.
+
+Usage:
+  rename [flags]
+
+Flags:
+  -f, --force         確認せずに実行する
+  -h, --help          help for rename
+  -n, --name string   変更するファイル名 (default "DEFAULT_NAME")
+  -p, --path string   ターゲットのパス (default "./")
+  -s, --seq int       N桁0埋め (default 3)
+```
+
+<br>
+
+### ◆ tojpg.sh
+
+1. 画像ファイルを任意のフォルダにまとめる
+2. 以下を実行する
+
+```bash
+$ bash tojpg.sh {まとめたフォルダ}
+```
+
++ 対応している拡張子
+
+```
+png / jpeg / gif / tif / tiff
+PNG / JPEG / GIF / TIF / TIFF / JPG
+```
 
 <br>
 
@@ -167,17 +154,13 @@ C:.
 
 1. `datasets/Images`に連番にした画像を置く
 
-   + seqrename.sh を使った場合は`seqrename-images`から移動する
+1. 以下を実行する
 
-1. 以下を実行する（引数にはフォルダ名を指定）
-
-   ```
-   python BBox-Label-Tool.py datasets
+   ```bash
+   $ python BBox-Label-Tool.py datasets
    ```
 
 1. <a href="https://github.com/puzzledqs/BBox-Label-Tool#bbox-label-tool" target="_blank">BBox-Label-Tool</a> のREADME.mdのように進めていく
-
-<br>
 
 <br>
 
@@ -193,10 +176,10 @@ C:.
    est
    ```
 
-2. 以下を実行する（引数にはフォルダ名を指定）
+2. 以下を実行する
 
-   ```
-   python imflate-images.py datasets
+   ```bash
+   $ python imflate-images.py datasets
    ```
    
    ※ BBox-Label-Tool後、`datasets/Images`, `datasets/Labels`にファイルがある状態で行う
@@ -265,14 +248,12 @@ C:.
 
 <br>
 
-<br>
-
 ### ◆ convert.py
 
 1. 以下を実行する
 
-   ```
-   python convert.py datasets
+   ```bash
+   $ python convert.py datasets
    ```
 
    + inflate_images.py を実行した場合は、以下をのフォルダを参照する
@@ -288,8 +269,6 @@ C:.
      ./datasets/Labels/	# ラベル
      ./datasets/Images/	# 画像
      ```
-
-<br>
 
 <br>
 
@@ -379,7 +358,7 @@ C:.
    .\darknet.exe detector train .\datasets\config\learning.data .\datasets\config\learning.cfg .\datasets\config\backup\learning_last.weights
    ```
 
-<br>
+
 
 
 
