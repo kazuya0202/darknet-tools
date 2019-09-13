@@ -15,7 +15,6 @@
 | inflate_images.py  | 画像増幅                       |
 | seqren.exe         | 画像ファイルの名前を連番にする |
 | tojpg.sh           | 画像の拡張子を`jpg`に変換する  |
-| bin `<dir>`        | 拡張子変換用など               |
 
 <br>
 
@@ -54,9 +53,6 @@ C:.
 │  README.md
 │  seqren.exe
 │  
-├─bin
-│      ffmpeg.exe
-│
 ├─datasets
 │  │  classes.txt
 │  │  
@@ -82,7 +78,7 @@ C:.
 │              est2.txt
 │              est3.txt
 │
-└─seqrename-images
+└─seqren-images
         hoge_001.jpg
         hoge_002.jpg
         hoge_003.jpg
@@ -133,6 +129,8 @@ Flags:
 <br>
 
 ### ◆ tojpg.sh
+
+※ [ffmpeg](https://ffmpeg.org/) が必要
 
 1. 画像ファイルを任意のフォルダにまとめる
 2. 以下を実行する
