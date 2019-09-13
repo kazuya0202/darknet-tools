@@ -8,29 +8,25 @@
 
 ### Tools
 
-| ツール             | 説明                           |
-| :----------------- | :----------------------------- |
-| BBox-Label-Tool.py | アノテーション                 |
-| convert.py         | BBox から yoloに変換           |
-| inflate_images.py  | 画像増幅                       |
-| seqren.exe         | 画像ファイルの名前を連番にする |
-| tojpg.sh           | 画像の拡張子を`jpg`に変換する  |
+| ツール                    | 説明                                       |
+| :------------------------ | :----------------------------------------- |
+| BBox-Label-Tool.py        | アノテーション                             |
+| convert.py                | yolo形式に変換                             |
+| inflate_images.py         | 画像増幅                                   |
+| remove_zero_annotation.py | アノテーションしなかったファイルを削除する |
+| seqren.exe                | 画像ファイルの名前を連番にする             |
+| tojpg.sh                  | 画像の拡張子を`jpg`に変換する              |
 
 <br>
 
 ### 実行に必要なもの
 
 + python
-+ (bash)
++ (ffmpeg)
 
 <br>
 
-+ python のインストール
-
->  公式：<a href="https://www.python.org/" target="_blank">https://www.python.org/</a>  
-> 参考：<a href="https://www.python.jp/install/windows/install_py3.html" target="_blank">Python3のインストール - python.jp</a>
-
-インストール後
++ モジュール / パッケージ
 
 ```bash
 $ pip install -r requirements.txt
@@ -87,14 +83,10 @@ C:.
 
 <br>
 
-## 実行手順 / 使い方
-
-※ コマンドプロンプト / bash で実行する
+## 使い方
 
 
 ### ◆ seqren.exe
-
-※ すでに連番である場合、または連番にしない場合は実行しなくてよい
 
 1. 連番にしたいファイルを任意のフォルダにまとめる
 
@@ -111,20 +103,20 @@ C:.
 
 + ファイル名や連番の桁数を指定する場合の詳細
 
-```bash
-$ ./seqren.exe --help
-ファイル名を連番にリネームします.
-
-Usage:
-  rename [flags]
-
-Flags:
-  -f, --force         確認せずに実行する
-  -h, --help          help for rename
-  -n, --name string   変更するファイル名 (default "DEFAULT_NAME")
-  -p, --path string   ターゲットのパス (default "./")
-  -s, --seq int       N桁0埋め (default 3)
-```
+  ```bash
+  $ ./seqren.exe --help
+  ファイル名を連番にリネームします.
+  
+  Usage:
+    rename [flags]
+  
+  Flags:
+    -f, --force         確認せずに実行する
+    -h, --help          help for rename
+    -n, --name string   変更するファイル名 (default "DEFAULT_NAME")
+    -p, --path string   ターゲットのパス (default "./")
+    -s, --seq int       N桁0埋め (default 3)
+  ```
 
 <br>
 
@@ -133,24 +125,25 @@ Flags:
 ※ [ffmpeg](https://ffmpeg.org/) が必要
 
 1. 画像ファイルを任意のフォルダにまとめる
+
 2. 以下を実行する
 
-```bash
-$ bash tojpg.sh {まとめたフォルダ}
-```
+   ```bash
+   $ bash tojpg.sh {まとめたフォルダ}
+   ```
 
 + 対応している拡張子
 
-```
-png / jpeg / gif / tif / tiff
-PNG / JPEG / GIF / TIF / TIFF / JPG
-```
+  ```
+  png / jpeg / gif / tif / tiff
+  PNG / JPEG / GIF / TIF / TIFF / JPG
+  ```
 
 <br>
 
 ### ◆ BBox-Label-Tool.py
 
-1. `datasets/Images`に連番にした画像を置く
+1. **datasets/Images**に連番にした画像を置く
 
 1. 以下を実行する
 
@@ -162,11 +155,23 @@ PNG / JPEG / GIF / TIF / TIFF / JPG
 
 <br>
 
+### ◆ remove_zero_annotation.py
+
+アノテーションしなかったファイルを全削除
+
++ `datasets/Labels/0**` を指定する（相対パス・絶対パスどちらでも可）
+
+  ```bash
+  $ python remove_zero_annotation.py datasets/Labels/0**
+  ```
+
+<br>
+
 ### ◆ inflate_images.py
 
 ※ 画像の増幅を行わない場合はスキップ
 
-1. `datasets/classes.txt`にクラスを記述する
+1. **datasets/classes.txt** にクラスを記述する
 
    ```
    # classes.txt の内容
