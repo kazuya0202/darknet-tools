@@ -2,13 +2,13 @@
 
 *Description :*
 
-+ `darknet.exe`のファイルがある場所にリポジトリ内のファイルを置く
++ `darknet.exe`がある場所にリポジトリ内のファイルを置く
 
 <br>
 
-### Tools
+### ツール
 
-| ツール                    | 説明                                       |
+| ツール                    |                                            |
 | :------------------------ | :----------------------------------------- |
 | BBox-Label-Tool.py        | アノテーション                             |
 | convert.py                | yolo形式に変換                             |
@@ -108,11 +108,12 @@ C:.
   ファイル名を連番にリネームします.
   
   Usage:
-    rename [flags]
+    seqren [flags]
   
   Flags:
+    -a, --all-show      全てのファイルを表示する
     -f, --force         確認せずに実行する
-    -h, --help          help for rename
+    -h, --help          help for seqren
     -n, --name string   変更するファイル名 (default "DEFAULT_NAME")
     -p, --path string   ターゲットのパス (default "./")
     -s, --seq int       N桁0埋め (default 3)
@@ -132,18 +133,16 @@ C:.
    $ bash tojpg.sh {まとめたフォルダ}
    ```
 
-+ 対応している拡張子
+ 対応している拡張子
 
-  ```
-  png / jpeg / gif / tif / tiff
-  PNG / JPEG / GIF / TIF / TIFF / JPG
-  ```
+> png / jpeg / gif / tif / tiff
+> PNG / JPEG / GIF / TIF / TIFF / JPG
 
 <br>
 
 ### ◆ BBox-Label-Tool.py
 
-1. **datasets/Images**に連番にした画像を置く
+1. `datasets/Images`に連番にした画像を置く
 
 1. 以下を実行する
 
@@ -259,7 +258,7 @@ C:.
    $ python convert.py datasets
    ```
 
-   + inflate_images.py を実行した場合は、以下をのフォルダを参照する
+   + **inflate_images.py** を実行した場合は、以下をのフォルダを参照する
 
      ```
      ./datasets/inflated-labels/		# ラベル
@@ -279,11 +278,9 @@ C:.
 
 1. 学習元データ [darknet53.conv.74](http://pjreddie.com/media/files/darknet53.conv.74) をダウンロードする
 
-   ※ ダウンロード済み、または既に学習を始めている場合はスキップ
-
    + ダウンロードしたファイルは`darknet.exe`と同じ階層に置く
-   + クローンした <a href="https://github.com/AlexeyAB/darknet" target="_blank">alexeyAB/darknet</a> の、`darknet/cfg/yolov3.cfg`ファイルをコピーして`darknet-tools/datasets/config/`に置く（ファイル名は`learning.cfg`）
-
++ `darknet/cfg/yolov3.cfg`ファイル`darknet-tools/datasets/config/`にコピーする（ファイル名は`learning.cfg`）
+   
    <br>
 
 2. 以下のようにファイルを編集する
