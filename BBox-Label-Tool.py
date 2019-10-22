@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -------------------------------------------------------------------------------
 # Name:        Object bounding box label tool
 # Purpose:     Label object bboxes for ImageNet Detection data
@@ -6,6 +5,7 @@
 # Created:     06/06/2014
 #
 # -------------------------------------------------------------------------------
+
 from __future__ import division
 # from tkinter import *
 import tkinter as tk
