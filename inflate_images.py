@@ -130,29 +130,23 @@ def main(data_dir, file_name, class_num, class_name, out_dir):
     base = os.path.splitext(os.path.basename(file_name))[0] + '_'
     img_src.astype(np.float64)
 
+    tmp_path = f'{data_dir}/{out_dir}/{class_name}'
+    if not os.path.exists(tmp_path):
+        os.makedirs(tmp_path)
+
+    tmp_path = f'{data_dir}/inflated_labels/{class_name}'
+    if not os.path.exists(tmp_path):
+        os.makedirs(tmp_path)
+
+    counter = 1
+    all_counter = len(trans_img)
+
     for i, img in enumerate(trans_img):
-        tmp_path = f'{data_dir}/{out_dir}/{class_num}'
-        if not os.path.exists(tmp_path):
-            os.makedirs(tmp_path)
-        # if not os.path.exists(
-        #         '{0}/{1}/{2}'.format(data_dir, out_dir, class_name)):
-        #     os.makedirs('{0}/{1}/{2}'.format(data_dir, out_dir, class_name))
 
-        tmp_path = f'{data_dir}/inflated_labels/{class_name}'
-        if not os.path.exists(tmp_path):
-            os.makedirs(tmp_path)
-
-        # if not os.path.exists(
-        #         '{0}/inflated_labels/{1}'.format(data_dir, class_name)):
-        #     os.makedirs('{0}/inflated_labels/{1}'.format(data_dir, class_name))
-
-        # new_file_name = base + str(i)
         new_file_name = f'{base}{i}'
         text_file_name = file_name.replace('.jpg', '.txt')
 
         img_path = f'{data_dir}/{out_dir}/{class_name}/{new_file_name}.jpg'
-        # cv2.imwrite('{0}/{1}/{2}/{3}'.format(data_dir, out_dir,
-        #                                      class_name, new_file_name + '.jpg'), img)
         cv2.imwrite(img_path, img)
 
         if i < flip_num:
@@ -167,6 +161,7 @@ def main(data_dir, file_name, class_num, class_name, out_dir):
                         if len(elems) != 4:
                             new_bb_data.write(line)
                             continue
+
                         x1 = int(elems[0])
                         y1 = int(elems[1])
                         x2 = int(elems[2])
@@ -174,6 +169,9 @@ def main(data_dir, file_name, class_num, class_name, out_dir):
                         width = img_src.shape[1]
                         new_bb_data.write('{0} {1} {2} {3}\n'.format(
                             width - x2, y1, width - x1, y2))
+
+        print(f'\r  %-15s: {counter} / {all_counter}' % file_name, end='')
+        counter += 1
 
 
 if __name__ == '__main__':
@@ -203,5 +201,6 @@ if __name__ == '__main__':
             for _, _, files in os.walk(f'{data_dir}/images/{class_num}'):
                 for file_name in files:
                     main(data_dir, file_name, class_num, class_name, out_dir)
+                    print()
 
     print('\nFinished.')
