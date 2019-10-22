@@ -280,7 +280,7 @@ C:.
 
    + ダウンロードしたファイルは`darknet.exe`と同じ階層に置く
 + `darknet/cfg/yolov3.cfg`ファイル`darknet-tools/datasets/config/`にコピーする（ファイル名は`learning.cfg`）
-   
+  
    <br>
 
 2. 以下のようにファイルを編集する
