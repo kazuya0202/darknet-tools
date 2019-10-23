@@ -4,6 +4,9 @@ import sys
 import os
 from shutil import copyfile
 
+COUNT = None
+counter = 0
+
 
 def equalizeHistRGB(src):
     # ヒストグラム均一化
@@ -53,6 +56,7 @@ def addSaltPepperNoise(src):
 
 
 def main(data_dir, file_name, class_num, class_name, out_dir):
+    global counter
 
     # ルックアップテーブルの生成
     min_table = 50
@@ -138,8 +142,7 @@ def main(data_dir, file_name, class_num, class_name, out_dir):
     if not os.path.exists(tmp_path):
         os.makedirs(tmp_path)
 
-    counter = 1
-    all_counter = len(trans_img)
+    all_counter = COUNT * len(trans_img)
 
     for i, img in enumerate(trans_img):
 
@@ -170,8 +173,8 @@ def main(data_dir, file_name, class_num, class_name, out_dir):
                         new_bb_data.write('{0} {1} {2} {3}\n'.format(
                             width - x2, y1, width - x1, y2))
 
-        print(f'\r  %-15s: {counter} / {all_counter}' % file_name, end='')
         counter += 1
+        print(f'\r  {counter} / {all_counter}', end='')
 
 
 if __name__ == '__main__':
@@ -195,12 +198,13 @@ if __name__ == '__main__':
     for i in classes:
         print(i, end=' ')
     print()
+    counter = 0
 
     for _, dirs, _ in os.walk(f'{data_dir}/images/'):
         for class_num, class_name in zip(dirs, classes):
             for _, _, files in os.walk(f'{data_dir}/images/{class_num}'):
+                COUNT = len(dirs) * len(files)
                 for file_name in files:
                     main(data_dir, file_name, class_num, class_name, out_dir)
-                    print()
 
     print('\nFinished.')
