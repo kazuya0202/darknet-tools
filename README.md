@@ -8,14 +8,14 @@
 
 ### ツール
 
-| ツール                    |                                            |
-| :------------------------ | :----------------------------------------- |
-| BBox-Label-Tool.py        | アノテーション                             |
-| convert.py                | yolo形式に変換                             |
-| inflate_images.py         | 画像増幅                                   |
-| remove_zero_annotation.py | アノテーションしなかったファイルを削除する |
-| seqren.exe                | 画像ファイルの名前を連番にする             |
-| tojpg.sh                  | 画像の拡張子を`jpg`に変換する              |
+| ツール                    |                                                           |
+| :------------------------ | :-------------------------------------------------------- |
+| BBox-Label-Tool.py        | アノテーション                                            |
+| convert.py                | yolo形式に変換                                            |
+| inflate_images.py         | 画像増幅                                                  |
+| remove_zero_annotation.py | アノテーションしなかったファイル（.txt / .jpg）を削除する |
+| seqren.exe                | 画像ファイルの名前を連番にする                            |
+| tojpg.sh                  | 画像の拡張子を`jpg`に変換する                             |
 
 <br>
 
@@ -48,10 +48,10 @@ C:.
 │  inflate_images.py
 │  README.md
 │  seqren.exe
-│  
+│
 ├─datasets
 │  │  classes.txt
-│  │  
+│  │
 │  ├─Images
 │  │  ├─001
 │  │  │      test.jpg
@@ -106,10 +106,10 @@ C:.
   ```bash
   $ ./seqren.exe --help
   ファイル名を連番にリネームします.
-  
+
   Usage:
     seqren [flags]
-  
+
   Flags:
     -a, --all-show      全てのファイルを表示する
     -f, --force         確認せずに実行する
@@ -158,11 +158,15 @@ C:.
 
 アノテーションしなかったファイルを全削除
 
-+ `datasets/Labels/0**` を指定する（相対パス・絶対パスどちらでも可）
++ `datasets/Labels/0**/` / `datasets/Images/0**/` を指定する（相対パス・絶対パスどちらでも可）
 
   ```bash
-  $ python remove_zero_annotation.py datasets/Labels/0**
+  $ python remove_zero_annotation.py datasets/Labels/0**/
+  # or
+  $ python remove_zero_annotation.py datasets/Images/0**/
   ```
+
+  削除対象のファイルがある場合、`y / Y / yes / Yes / YES`のどれかを入力して削除する（誤削除防止）
 
 <br>
 
@@ -183,7 +187,7 @@ C:.
    ```bash
    $ python imflate-images.py datasets
    ```
-   
+
    ※ BBox-Label-Tool後、`datasets/Images`, `datasets/Labels`にファイルがある状態で行う
 
 + `datasets`以下に`inflated_labels`, `obj`フォルダが生成される
@@ -280,10 +284,18 @@ C:.
 
    + ダウンロードしたファイルは`darknet.exe`と同じ階層に置く
 + `darknet/cfg/yolov3.cfg`ファイル`darknet-tools/datasets/config/`にコピーする（ファイル名は`learning.cfg`）
-  
+
    <br>
 
 2. 以下のようにファイルを編集する
+
+   >  **※ Note:**
+   >
+   > （コメントアウトを除く）
+   >
+   > ここでは説明のためコメントを書いているが、コメントを書くと誤作動を招く可能性があるので極力書かないように！
+   >
+   > `steps`などの要素の後ろにコメントを書くのは絶対にNG。
 
    ```bash
    ## クラス数が2の場合の例
@@ -293,7 +305,6 @@ C:.
    max_batches=4000	# classes*2000
    steps=3200,3600		# max_batches*0.80, max_batches*0.90
    # ......
-   
    
    ## 以下3か所ずつ（filtersはたくさんあるため、classesで検索をかけて見つけること）
    
@@ -309,16 +320,15 @@ C:.
    classes=2
    ```
 
-   **※1**：`batch=XX`はデータセットのサイズに応じて変更する（XXには2のn乗の値 `32, 64, 128, 256, 512, 1024, 2048` が使われることが多い）
+   **※1**：`batch=XX`はデータセットのサイズに応じて変更する（数値は2^N^ 値`32, 64, 128, 256 ...` が使われることが多い）
 
    > ```bash
    > # データセットのサイズ
-   > 数百件 >> 32, 64 ...
-   > 数千件 >> 128, 256 ...
-   > 数万件 >> 1024, 2048 ...
+   > 数百件          >> 32, 64 ...
+   > 数千件 ～ 数万件 >> 128, 256 ...
    > ```
-   >
-   > 学習がうまくいっておらず、ほかに調整するパラメータがなくなったときはこのバッチサイズを大きくしたり小さくしたりするとよい
+   > 
+   >学習がうまくいっておらず、ほかに調整するパラメータがなくなったときはこのバッチサイズを大きくしたり小さくしたりするとよい
 
    <br>
 
@@ -357,11 +367,3 @@ C:.
    ```
    .\darknet.exe detector train .\datasets\config\learning.data .\datasets\config\learning.cfg .\datasets\config\backup\learning_last.weights
    ```
-
-
-
-
-
-
-
-
