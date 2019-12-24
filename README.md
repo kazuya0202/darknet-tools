@@ -8,29 +8,27 @@
 
 ### ツール
 
-| ツール                    |                                                           |
-| :------------------------ | :-------------------------------------------------------- |
-| BBox-Label-Tool.py        | アノテーション                                            |
-| convert.py                | yolo形式に変換                                            |
-| inflate_images.py         | 画像増幅                                                  |
-| remove_zero_annotation.py | アノテーションしなかったファイル（.txt / .jpg）を削除する |
-| seqren.exe                | 画像ファイルの名前を連番にする                            |
-| tojpg.sh                  | 画像の拡張子を`jpg`に変換する                             |
+| ツール                                                       |                                                           |
+| :----------------------------------------------------------- | :-------------------------------------------------------- |
+| BBox-Label-Tool.py                                           | アノテーション                                            |
+| convert.py                                                   | yolo形式に変換                                            |
+| inflate_images.py                                            | 画像増幅                                                  |
+| remove_zero_annotation.py                                    | アノテーションしなかったファイル（.txt / .jpg）を削除する |
+| seqren.exe（[release](https://github.com/kazuya0202/darknet-tools/releases)） | 画像ファイルの名前を連番にする                            |
+| tojpg.sh                                                     | 画像の拡張子を`jpg`に変換する                             |
 
 <br>
 
 ### 実行に必要なもの
-
-+ python
-+ (ffmpeg)
-
-<br>
 
 + モジュール / パッケージ
 
 ```bash
 $ pip install -r requirements.txt
 ```
+
++ Pillow
++ opencv-python
 
 <br>
 
@@ -47,7 +45,6 @@ C:.
 │  convert.py
 │  inflate_images.py
 │  README.md
-│  seqren.exe
 │
 ├─datasets
 │  │  classes.txt
@@ -85,8 +82,9 @@ C:.
 
 ## 使い方
 
-
 ### ◆ seqren.exe
+
+※ [release](https://github.com/kazuya0202/darknet-tools/releases) からダウンロード。
 
 1. 連番にしたいファイルを任意のフォルダにまとめる
 
@@ -136,13 +134,13 @@ C:.
  対応している拡張子
 
 > png / jpeg / gif / tif / tiff
-> PNG / JPEG / GIF / TIF / TIFF / JPG
+> PNG / JPEG / GIF / TIF / TIFF
 
 <br>
 
 ### ◆ BBox-Label-Tool.py
 
-1. `datasets/Images`に連番にした画像を置く
+1. `datasets/Images`に画像を置く
 
 1. 以下を実行する
 
@@ -156,7 +154,7 @@ C:.
 
 ### ◆ remove_zero_annotation.py
 
-アノテーションしなかったファイルを全削除
+アノテーションしなかったファイルを全て削除
 
 + `datasets/Labels/0**/` / `datasets/Images/0**/` を指定する（相対パス・絶対パスどちらでも可）
 
@@ -177,7 +175,7 @@ C:.
 1. **datasets/classes.txt** にクラスを記述する
 
    ```
-   # classes.txt の内容
+   # classes.txt
    test
    est
    ```
@@ -299,23 +297,23 @@ C:.
 
    ```bash
    ## クラス数が2の場合の例
-   
+
    batch=64		# ※1
    subdivisions=8	# ※2
    max_batches=4000	# classes*2000
    steps=3200,3600		# max_batches*0.80, max_batches*0.90
    # ......
-   
+
    ## 以下3か所ずつ（filtersはたくさんあるため、classesで検索をかけて見つけること）
-   
+
    ## filters: 603行目, 689行目, 776行目
    ## classes: 610行目, 696行目, 783行目 (2019/7/02 現在)
    ## 計算式は後に記述
-   
+
    # [convolutional]
    # classesの上にあるfiltersの数値だけ変更
    filters=21		# ※3
-   
+
    # [yolo]
    classes=2
    ```
@@ -324,10 +322,10 @@ C:.
 
    > ```bash
    > # データセットのサイズ
-   > 数百件          >> 32, 64 ...
+   > 数百件           >> 32, 64 ...
    > 数千件 ～ 数万件 >> 128, 256 ...
    > ```
-   > 
+   >
    >学習がうまくいっておらず、ほかに調整するパラメータがなくなったときはこのバッチサイズを大きくしたり小さくしたりするとよい
 
    <br>
@@ -346,7 +344,7 @@ C:.
 
    ```bash
    (classes + 5) * 3
-   
+
    # 例
    classes=1  >>  filters=18	# (1+5)*3
    classes=2  >>  filters=21	# (2+5)*3
