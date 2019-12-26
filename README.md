@@ -15,7 +15,7 @@
 | convert2jpg.py                                               | 画像の拡張子を`jpg`に変換する                             |
 | inflate_images.py                                            | 画像増幅                                                  |
 | remove_zero_annotation.py                                    | アノテーションしなかったファイル（.txt / .jpg）を削除する |
-| seqren.exe（[release](https://github.com/kazuya0202/darknet-tools/releases)） | 画像ファイルの名前を連番にする                            |
+| seqren.exe（[release](https://github.com/kazuya0202/darknet-tools/releases)） | ファイル名を連番にする                                    |
 
 <br>
 
@@ -85,6 +85,12 @@ C:.
 
 ### ◆ seqren.exe
 
+ファイル名を連番に変更する。
+
+※ 必要のない場合はスキップ
+
+<br>
+
 <details><summary>クリックして展開</summary>
 
 ※ [release](https://github.com/kazuya0202/darknet-tools/releases) からダウンロード。
@@ -126,6 +132,17 @@ C:.
 
 ### ◆ convert2jpg.py
 
+画像の拡張子を`jpg`に変換する。
+
+> + 対応している拡張子
+>
+> ```
+> png / jpeg / gif / tif / tiff
+> PNG / JPEG / GIF / TIF / TIFF / JPG
+> ```
+
+<br>
+
 1. 画像ファイルを任意のフォルダにまとめる
 
 2. 以下を実行する
@@ -139,16 +156,13 @@ C:.
    
    削除対象のファイルがある場合、`y / Y / yes / Yes / YES`のどれかを入力して削除する（誤削除防止）
 
-> + 対応している拡張子
->
-> ```
-> png / jpeg / gif / tif / tiff
-> PNG / JPEG / GIF / TIF / TIFF / JPG
-> ```
-
 <br>
 
 ### ◆ BBox-Label-Tool.py
+
+アノテーションを行う。
+
+<br>
 
 1. `datasets/Images`に画像を置く
 
@@ -180,7 +194,11 @@ C:.
 
 ### ◆ inflate_images.py
 
-※ 画像の増幅を行わない場合はスキップ
+画像の増幅を行う。
+
+※ 行わない場合はスキップ
+
+<br>
 
 1. **datasets/classes.txt** にクラスを記述する
 
@@ -263,6 +281,10 @@ C:.
 <br>
 
 ### ◆ convert.py
+
+アノテーションファイルを、BBox形式からYOLO形式に変換する。
+
+<br>
 
 1. 以下を実行する
 
