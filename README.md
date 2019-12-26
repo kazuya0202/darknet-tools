@@ -12,10 +12,10 @@
 | :----------------------------------------------------------- | :-------------------------------------------------------- |
 | BBox-Label-Tool.py                                           | アノテーション                                            |
 | convert.py                                                   | yolo形式に変換                                            |
+| convert2jpg.py                                               | 画像の拡張子を`jpg`に変換する                             |
 | inflate_images.py                                            | 画像増幅                                                  |
 | remove_zero_annotation.py                                    | アノテーションしなかったファイル（.txt / .jpg）を削除する |
 | seqren.exe（[release](https://github.com/kazuya0202/darknet-tools/releases)） | 画像ファイルの名前を連番にする                            |
-| tojpg.sh                                                     | 画像の拡張子を`jpg`に変換する                             |
 
 <br>
 
@@ -29,6 +29,7 @@ $ pip install -r requirements.txt
 
 + Pillow
 + opencv-python
++ ffmpeg-python
 
 <br>
 
@@ -84,6 +85,8 @@ C:.
 
 ### ◆ seqren.exe
 
+<details><summary>クリックして展開</summary>
+
 ※ [release](https://github.com/kazuya0202/darknet-tools/releases) からダウンロード。
 
 1. 連番にしたいファイルを任意のフォルダにまとめる
@@ -117,24 +120,31 @@ C:.
     -s, --seq int       N桁0埋め (default 3)
   ```
 
+  </details>
+
 <br>
 
-### ◆ tojpg.sh
-
-※ [ffmpeg](https://ffmpeg.org/) が必要
+### ◆ convert2jpg.py
 
 1. 画像ファイルを任意のフォルダにまとめる
 
 2. 以下を実行する
 
    ```bash
-   $ bash tojpg.sh {まとめたフォルダ}
+   $ python convert2jpg.py {画像フォルダ}
+
+   # Example
+   $ python convert2jpg.py datasets/Images/001/
    ```
+   
+   削除対象のファイルがある場合、`y / Y / yes / Yes / YES`のどれかを入力して削除する（誤削除防止）
 
- 対応している拡張子
-
+> + 対応している拡張子
+>
+> ```
 > png / jpeg / gif / tif / tiff
-> PNG / JPEG / GIF / TIF / TIFF
+> PNG / JPEG / GIF / TIF / TIFF / JPG
+> ```
 
 <br>
 

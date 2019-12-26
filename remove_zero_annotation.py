@@ -15,6 +15,9 @@ def main():
         print('パスに￥が含まれる場合はクォーテーションで囲んでください.')
         sys.exit(-1)
 
+    if path.is_file():
+        path = Path(path.parent)
+
     # convert path into absolute path
     target_path = path.resolve()
 
@@ -28,8 +31,10 @@ def main():
 
     # determine what specified path is 'Images' or 'Labels'
     if dirs[1] == 'Images':
-        tmp_path = Path(path.parent).parent
-        path = tmp_path.joinpath(f'Labels/{dirs[0]}')
+        p = Path()
+
+        add = [path.parents[1], 'Labels', dirs[0]]
+        path = p.joinpath(*add)
 
     # 削除するファイルのパス
     path_list = []
@@ -37,19 +42,19 @@ def main():
     for file in path.glob('*'):
         p_txt = Path(file)
 
+        # not .txt or directory -> continue
         if p_txt.suffix != '.txt' or p_txt.is_dir():
             continue
 
-        with open(str(p_txt)) as f:
-            # アノテーションされているファイルなら
-            if f.read()[0] != '0':
-                continue
+        # first element is '0'
+        if p_txt.read_text()[0] != '0':
+            continue
 
-        # image file path
-        name = p_txt.name.replace('.txt', '.jpg')
+        add = ['Images', dirs[0], p_txt.name]
+        p_img = target_path.joinpath(*add)
 
-        add_path = f'Images/{dirs[0]}/{name}'
-        p_img = target_path.joinpath(add_path)
+        # change extension .* -> .jpg
+        p_img = p_img.with_suffix('.jpg')
 
         # convert path into relative path
         p_img = p_img.relative_to(path.cwd())
@@ -66,33 +71,29 @@ def main():
 
     # show list 10 num
     for i, path in enumerate(path_list):
-        print(str(path))
+        print(path)
         if i == 9:
             print('  ...')
             break
     print()
 
     # check remove OK?
-    is_remove = False
     ans_list = ['y', 'Y', 'yes', 'Yes', 'YES']
-
     ans = input('Remove OK? (y/N): ')
-    if ans in ans_list:
-        is_remove = True
+
+    # true / false
+    is_remove = ans in ans_list
 
     # do not remove
     if not is_remove:
         print('Exit without removing.')
         exit()
 
+    # ファイルが存在する事は確認済み
     for path in path_list:
-        # ファイルが存在するなら
-        if path.exists():
-            # remove
-            path.unlink()
-            print(f'deleted: {path}')
-
-    exit()
+        # remove
+        path.unlink()
+        print(f'deleted: {path}')
 
 
 if __name__ == '__main__':

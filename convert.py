@@ -1,6 +1,6 @@
 import sys
 import os
-import subprocess
+# import subprocess
 import random
 # import time
 from os import walk, getcwd
@@ -13,8 +13,8 @@ is_show = False
 def create_config(data_dir, train_ratio):
     all_list = []
     for cls in classes:
-        with open(f'{data_dir}/config/{cls}_list.txt', 'r') as list_file:
-            for file_name in list_file.readlines():
+        with open(f'{data_dir}/config/{cls}_list.txt', 'r') as f:
+            for file_name in f.readlines():
                 if not (file_name in all_list):
                     all_list.append(file_name)
 
@@ -36,7 +36,8 @@ def create_config(data_dir, train_ratio):
             valid_list_file.write(file_name)
 
     with open(f'{data_dir}/config/learning.data', 'w') as data_config:
-        data_config.write(f'classes = {len(classes)}\n')
+        class_num = len(classes)
+        data_config.write(f'classes = {class_num}\n')
         data_config.write(f'train = {data_dir}/config/train.txt\n')
         data_config.write(f'valid = {data_dir}/config/valid.txt\n')
         data_config.write(f'names = {data_dir}/config/learning.names\n')
@@ -121,13 +122,15 @@ def main(data_dir, obj_dir):
 
         # input ファイル名を取得
         txt_name_list = []
-        for (dirpath, dirnames, filenames) in walk(label_path):
+        for (_, _, filenames) in walk(label_path):
             txt_name_list.extend(filenames)
 
         if is_show:
             print(f'txt_name_list = {txt_name_list}')
 
         all_counter = len(txt_name_list)
+
+        out_path = os.path.join(data_dir, image_dir, target_dir)
 
         # input ファイル数分変換処理
         for txt_name in txt_name_list:
@@ -138,38 +141,38 @@ def main(data_dir, obj_dir):
                 lines = txt_file.read().replace('\r\n', '\n').split('\n')
 
             # outputファイル作成
-            txt_outfile = open(f'{cls_dir}/{txt_name}', 'w')
+            # txt_outfile = open(f'{cls_dir}/{txt_name}', 'w')
+            with open(f'{cls_dir}/{txt_name}', 'w') as f:
+                fname = os.path.splitext(txt_name)[0]
+                img_path = os.path.join(out_path, f'{fname}.jpg')
+                # img_path = f'{data_dir}/{image_dir}/{target_dir}/{fname}.jpg'
 
-            fname = os.path.splitext(txt_name)[0]
-            img_path = f'{data_dir}/{image_dir}/{target_dir}/{fname}.jpg'
+                im = Image.open(img_path)
+                w = int(im.size[0])
+                h = int(im.size[1])
 
-            im = Image.open(img_path)
-            w = int(im.size[0])
-            h = int(im.size[1])
+                ct = 0
+                for line in lines:
+                    # if len(line) >= 4:
+                    if len(line) < 4:
+                        continue
 
-            ct = 0
-            for line in lines:
-                # if len(line) >= 4:
-                if len(line) < 4:
-                    continue
+                    ct += 1
+                    elems = line.split(' ')
 
-                ct += 1
-                elems = line.split(' ')
+                    if is_show:
+                        print(line + '\n')
+                        print(elems)
 
-                if is_show:
-                    print(line + '\n')
-                    print(elems)
+                    xmin = float(elems[0])
+                    xmax = float(elems[2])
+                    ymin = float(elems[1])
+                    ymax = float(elems[3])
 
-                xmin = float(elems[0])
-                xmax = float(elems[2])
-                ymin = float(elems[1])
-                ymax = float(elems[3])
-
-                b = (xmin, xmax, ymin, ymax)
-                bb = convert((w, h), b)
-                txt_outfile.write(f'{cls_id} %s\n' % ' '.join([str(a) for a in bb]))
-
-            txt_outfile.close()
+                    b = (xmin, xmax, ymin, ymax)
+                    bb = convert((w, h), b)
+                    f.write(f'{cls_id} %s\n' % ' '.join([str(a) for a in bb]))
+            # txt_outfile.close()
 
             if not is_show:
                 print(f'\r * %-10s: {counter} / {all_counter}' % cls, end='')
@@ -223,5 +226,7 @@ if __name__ == '__main__':
     print('\nFinished.')
 
     # 不要なリストを削除する
+    path = os.path.join(data_dir, 'config')
     for i in classes:
-        subprocess.call(f'del {data_dir}\\config\\{i}_list.txt', shell=True)
+        os.remove(os.path.join(path, f'{i}_list.txt'))
+        # subprocess.call(f'del {data_dir}\\config\\{i}_list.txt', shell=True)

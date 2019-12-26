@@ -2,6 +2,9 @@
 !datasets/Images/001/test*.jpg
 !datasets/Images/002/est*.jpg
 
+datasets/config/
+datasets/obj/
+
 ### Python
 
 # Byte-compiled / optimized / DLL files
