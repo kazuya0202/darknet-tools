@@ -1,10 +1,10 @@
 import sys
 import os
-# import subprocess
 import random
-# import time
 from os import walk, getcwd
 from PIL import Image
+
+import utils.utils as ul
 
 classes = []
 is_show = False
@@ -153,7 +153,6 @@ def main(data_dir, obj_dir):
 
                 ct = 0
                 for line in lines:
-                    # if len(line) >= 4:
                     if len(line) < 4:
                         continue
 
@@ -193,9 +192,12 @@ def main(data_dir, obj_dir):
 if __name__ == '__main__':
     argv = sys.argv
 
+    if ul.has_elems_in_list(argv, '-show'):
+        is_show = True
+
     if len(argv) < 2 and argv[1] != '-show':
         print('please set data directory path.')
-        print('python [input_folder] [inflated_images_folder] [learing_ratio]\n\n')
+        print('python [input_folder] [inflated_images_folder] [learing_ratio] [-show]\n\n')
         exit(-1)
     data_dir = argv[1]
 
@@ -212,7 +214,7 @@ if __name__ == '__main__':
 
     # 学習の割合
     train_ratio = -1
-    if len(argv) >= 4:
+    if len(argv) >= 4 and argv[3] != '-show':
         train_ratio = float(argv[3])
 
     if '-show' in argv:
