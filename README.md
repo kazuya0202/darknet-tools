@@ -1,27 +1,22 @@
 # Darknet データセット作成ツール
 
-*Description :*
+## ツール
 
-+ `darknet.exe`がある場所にリポジトリ内のファイルを置く
-
-<br>
-
-### ツール
-
-| ツール                                                       |                                                           |
-| :----------------------------------------------------------- | :-------------------------------------------------------- |
-| BBox-Label-Tool.py                                           | アノテーション                                            |
-| convert.py                                                   | yolo形式に変換                                            |
-| convert2jpg.py                                               | 画像の拡張子を`jpg`に変換する                             |
-| inflate_images.py                                            | 画像増幅                                                  |
-| remove_zero_annotation.py                                    | アノテーションしなかったファイル（.txt / .jpg）を削除する |
-| seqren.exe（[release](https://github.com/kazuya0202/darknet-tools/releases)） | ファイル名を連番にする                                    |
+| ツール                                                       |                                                             |
+| :----------------------------------------------------------- | :---------------------------------------------------------- |
+| BBox-Label-Tool.py                                           | アノテーション                                              |
+| convert.py                                                   | yolo形式に変換                                              |
+| convert2jpg.py                                               | 画像の拡張子を`jpg`に変換する                               |
+| generate_cfg.py                                              | `cfg`を自動生成する                                         |
+| inflate_images.py                                            | 画像増幅                                                    |
+| remove_zero_annotation.py                                    | アノテーションしなかったファイル（`txt` / `jpg`）を削除する |
+| seqren.exe（[download](https://github.com/kazuya0202/darknet-tools/releases)） | ファイル名を連番にする                                      |
 
 <br>
 
-### 実行に必要なもの
+## 事前準備
 
-+ モジュール / パッケージ
+### モジュール / パッケージ
 
 ```bash
 $ pip install -r requirements.txt
@@ -33,19 +28,36 @@ $ pip install -r requirements.txt
 
 <br>
 
+### ディレクトリの移動
+
+クローン（zipダウンロード）した`darknet-tools`を、`darknet/build/darknet/x64/`に移動する。
+
+```
+~/darknet/build/darknet/x64/darknet-tools/
+```
+
+<br>
+
 ### ディレクトリ構造
 
-<details><summary>クローン時（クリックして展開）</summary><div>
+<details><summary>クリックして展開</summary><div>
+
 
 
 ```
-# ~\darknet-tools\
-
 C:.
+│  .gitignore
 │  BBox-Label-Tool.py
 │  convert.py
+│  convert2jpg.py
+│  generate_cfg.py
 │  inflate_images.py
 │  README.md
+│  remove_zero_annotation.py
+│  requirements.txt
+│
+├─cfg
+│      yolov3.cfg
 │
 ├─datasets
 │  │  classes.txt
@@ -62,20 +74,18 @@ C:.
 │  │          est3.jpg
 │  │
 │  └─Labels
-│      ├─001
-│      │      test.txt
-│      │      test2.txt
-│      │      test3.txt
-│      │
-│      └─002
-│              est.txt
-│              est2.txt
-│              est3.txt
+│     ├─001
+│     │      test.txt
+│     │      test2.txt
+│     │      test3.txt
+│     │
+│     └─002
+│             est.txt
+│             est2.txt
+│             est3.txt
 │
-└─seqren-images
-        hoge_001.jpg
-        hoge_002.jpg
-        hoge_003.jpg
+└─utils
+        utils.py
 ```
 </div></details>
 
@@ -91,9 +101,10 @@ C:.
 
 <br>
 
-<details><summary>クリックして展開</summary>
+<details><summary>説明（クリックして展開）</summary>
 
-※ [release](https://github.com/kazuya0202/darknet-tools/releases) からダウンロード。
+
+※ [release](https://github.com/kazuya0202/darknet-tools/releases) からダウンロードする。
 
 1. 連番にしたいファイルを任意のフォルダにまとめる
 
@@ -134,7 +145,11 @@ C:.
 
 画像の拡張子を`jpg`に変換する。
 
-> + 対応している拡張子
+※ 必要のない場合はスキップ
+
+<br>
+
+> + 対象画像の拡張子
 >
 > ```
 > png / jpeg / gif / tif / tiff
@@ -147,8 +162,8 @@ C:.
 
 2. 以下を実行する
 
-   ```bash
-   $ python convert2jpg.py {画像フォルダ}
+   ```sh
+   $ python convert2jpg.py <画像フォルダ>
 
    # Example
    $ python convert2jpg.py datasets/Images/001/
@@ -162,6 +177,8 @@ C:.
 
 アノテーションを行う。
 
+※ アノテーションしなかったファイルは、次の`remove_zero_annotation.py`の実行で削除できるため、消さなくてよい。
+
 <br>
 
 1. `datasets/Images`に画像を置く
@@ -169,7 +186,7 @@ C:.
 1. 以下を実行する
 
    ```bash
-   $ python BBox-Label-Tool.py datasets
+   $ python BBox-Label-Tool.py datasets/
    ```
 
 1. <a href="https://github.com/puzzledqs/BBox-Label-Tool#bbox-label-tool" target="_blank">BBox-Label-Tool</a> のREADME.mdのように進めていく
@@ -178,7 +195,9 @@ C:.
 
 ### ◆ remove_zero_annotation.py
 
-アノテーションしなかったファイルを全て削除
+アノテーションしなかったファイルを全て削除する。
+
+<br>
 
 + `datasets/Labels/0**/` / `datasets/Images/0**/` を指定する（相対パス・絶対パスどちらでも可）
 
@@ -200,30 +219,35 @@ C:.
 
 <br>
 
-1. **datasets/classes.txt** にクラスを記述する
+1. クラスを記述する
 
    ```
-   # classes.txt
+   # darknet-tools/datasets/classes.txt
+   
    test
    est
    ```
 
-2. 以下を実行する
+2. スクリプトを実行する
 
    ```bash
-   $ python imflate-images.py datasets
+   $ python imflate-images.py datasets/
    ```
 
    ※ BBox-Label-Tool後、`datasets/Images`, `datasets/Labels`にファイルがある状態で行う
 
 + `datasets`以下に`inflated_labels`, `obj`フォルダが生成される
 
+  > `inflated_labels`：増幅後のラベル
+  >
+  > `obj`：増幅後の画像
+
 <br>
 
 <details><summary>ディレクトリ構造（クリックして展開）</summary><div>
 
 ```
-# ~\darknet-tools\datasets\
+# darknet-tools/datasets/
 
 C:.
 │  classes.txt
@@ -286,114 +310,154 @@ C:.
 
 <br>
 
-1. 以下を実行する
++ 以下を実行する
 
-   ```bash
-   $ python convert.py datasets
+   ```sh
+   $ python convert.py datasets/
    ```
 
-   + **inflate_images.py** を実行した場合は、以下をのフォルダを参照する
+> + **inflate_images.py** を実行した場合は、以下をのフォルダを参照する
+>
+> ```
+> ./datasets/inflated_labels/		# ラベル
+> ./datasets/obj/[クラス名]/		 # 画像
+> ```
+>
+> + 実行しなかった場合は、以下のフォルダを参照する
+>
+> ```
+> ./datasets/Labels/	# ラベル
+> ./datasets/Images/	# 画像
+> ```
 
-     ```
-     ./datasets/inflated-labels/		# ラベル
-     ./datasets/obj/{クラス名}/		 # 画像
-     ```
+<br>
 
-   + 実行しなかった場合は、以下のフォルダを参照する
+### ◆ generate_cfg.py
 
-     ```
-     ./datasets/Labels/	# ラベル
-     ./datasets/Images/	# 画像
-     ```
+cfgファイルを自動生成し、実行前に必要な編集を（ある程度）自動的に行う。
+
++ 以下を実行する
+
+  ```sh
+  $ python generate_cfg.py [cfg_name]
+  ```
+
+> + `[cfg_name]`を指定しない場合、**cfg/yolov3.cfg** をもとに生成する。（生成先 → **datasets/config/learning.cfg**）
+> + `[cfg_name]`には、ローカルにあるもの、もしくは、`alexeyAB/darknet/cfg/`にあるものを指定する。
+>   + ローカルにないファイル名を指定された場合、オンライン上から探すため、**yolov3-tiny.cfg** などのファイル名のみを指定する。
+>
+> <br>
+>
+> + 変更するパラメータ
+>
+> ```
+> classes
+> filters
+> max_batches
+> steps
+> ```
+>
+> **Note:** これを実行した場合、[#Darknetの実行](#Darknetの実行) の`2, 3`を行う必要はない。ただし、`batch, subdivision`の値は、実行環境によって異なるため、変更する必要がある。
 
 <br>
 
 ## Darknetの実行
 
-1. 学習元データ [darknet53.conv.74](http://pjreddie.com/media/files/darknet53.conv.74) をダウンロードする
+1. 学習元データ **darknet53.conv.74** をダウンロードする
 
-   + ダウンロードしたファイルは`darknet.exe`と同じ階層に置く
-+ `darknet/cfg/yolov3.cfg`ファイル`darknet-tools/datasets/config/`にコピーする（ファイル名は`learning.cfg`）
+   + [ダウンロード](http://pjreddie.com/media/files/darknet53.conv.74)
+   + ファイルは`darknet.exe`と同じ階層に置く
+   
+   <br>
+   
+2. `darknet/cfg/yolov3.cfg`ファイルを`darknet-tools/datasets/config/`にコピーする（ファイル名は`learning.cfg`とする）
 
    <br>
 
-2. 以下のようにファイルを編集する
+3. 以下のようにファイルを編集する
 
    >  **※ Note:**
    >
-   > （コメントアウトを除く）
+   > （行頭のコメントアウトを除く）
    >
    > ここでは説明のためコメントを書いているが、コメントを書くと誤作動を招く可能性があるので極力書かないように！
    >
-   > `steps`などの要素の後ろにコメントを書くのは絶対にNG。
 
-   ```bash
-   ## クラス数が2の場合の例
-
-   batch=64		# ※1
-   subdivisions=8	# ※2
+   ```sh
+   ## クラス数=2 の場合の例
+   
+   batch=64	# データセットのサイズに応じて変更（※1）
+   subdivisions=8	# GPUの性能などによって値が変わる（※2）
    max_batches=4000	# classes*2000
    steps=3200,3600		# max_batches*0.80, max_batches*0.90
+   
    # ......
-
-   ## 以下3か所ずつ（filtersはたくさんあるため、classesで検索をかけて見つけること）
-
-   ## filters: 603行目, 689行目, 776行目
-   ## classes: 610行目, 696行目, 783行目 (2019/7/02 現在)
-   ## 計算式は後に記述
-
+   
+   ### =================
+   # classes, filters の値を変更する
+   # (重要) filtersの変更箇所は、classesの数行上にある行のみ
+   
+   # 以下3か所ずつ（classesで検索をかけて見つけること）
+   # filters: 603行目, 689行目, 776行目
+   # classes: 610行目, 696行目, 783行目 (2019/7/02 現在)
+   ### =================
+   
    # [convolutional]
-   # classesの上にあるfiltersの数値だけ変更
-   filters=21		# ※3
-
+   filters=21	# 計算式は後述（※3）
+   
    # [yolo]
    classes=2
    ```
 
    **※1**：`batch=XX`はデータセットのサイズに応じて変更する（数値は2^N^ 値`32, 64, 128, 256 ...` が使われることが多い）
 
-   > ```bash
+   > ```sh
    > # データセットのサイズ
    > 数百件           >> 32, 64 ...
    > 数千件 ～ 数万件 >> 128, 256 ...
    > ```
    >
-   >学習がうまくいっておらず、ほかに調整するパラメータがなくなったときはこのバッチサイズを大きくしたり小さくしたりするとよい
+   
 
-   <br>
+    <br>
 
-   **※2**：学習を開始したときに、GPUのメモリの関係でエラーが発生して中断したときは`subdivision`の値を変更する
+    **※2**：学習を開始したときに、GPUの関係でエラー（*CUDA Error: out of memory*）が発生して中断したときは`subdivision`の値を変更する
+   
+    ```sh
+       subdivision=16	# 8 でダメなら
+       subdivision=32	# 16 〃
+       subdivision=64	# 32 〃
+    ```
+   
+    > `subdivision`の値が小さいほうが、学習にかかる時間は短くなる。
+       >
+       > `subdivision`の値が`batch`の値より大きくなることはない。
+   
+    <br>
+   
+    **※3**：`filters`の数値は以下の式で計算する
+   
+    ```bash
+       (classes + 5) * 3
+    
+       # 例
+       classes=1  >>  filters=18	# (1+5)*3
+       classes=2  >>  filters=21	# (2+5)*3
+    ```
 
-   ```bash
-   subdivision=16	# next to 8
-   subdivision=32	# next to 16
-   subdivision=64	# next to 32
+<br>
+
+4. 訓練コマンドを実行する
+
+   ```
+   .\darknet.exe detector train .\darknet-tools\datasets\config\learning.data .\darknet-tools\datasets\config\learning.cfg .\darknet53.conv.74
    ```
 
    <br>
 
-   **※3**：`filters`の数値は以下の式で計算する
-
-   ```bash
-   (classes + 5) * 3
-
-   # 例
-   classes=1  >>  filters=18	# (1+5)*3
-   classes=2  >>  filters=21	# (2+5)*3
-   ```
-
-   <br>
-
-3. 訓練コマンドを実行する
+   + 学習を再開させる場合、`learning_last.weights`ファイルを指定する
 
    ```
-   .\darknet.exe detector train .\datasets\config\learning.data .\datasets\config\learning.cfg .\darknet53.conv.74
+   .\darknet.exe detector train .\darknet-tools\datasets\config\learning.data .\darknet-tools\datasets\config\learning.cfg .\darknet-tools\datasets\config\backup\learning_last.weights
    ```
 
-   <br>
-
-4. 学習を再開させる場合、weightsファイルを指定する
-
-   ```
-   .\darknet.exe detector train .\datasets\config\learning.data .\datasets\config\learning.cfg .\datasets\config\backup\learning_last.weights
-   ```

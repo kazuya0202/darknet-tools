@@ -30,6 +30,16 @@ def convert_extension(path, ext):
 
 if __name__ == "__main__":
     import sys
+    argv = sys.argv
+    if len(argv) < 2:
+        print('  Need a directory path included images.\n')
+
+        print('Usage:')
+        print('  * python convert2jpg.py <directory path>\n')
+
+        print('Example:')
+        print('  * python convert2jpg.py datasets/Images/001/')
+        exit(-1)
 
     target_ext = '.jpg'
 
@@ -46,24 +56,18 @@ if __name__ == "__main__":
 
     path_list = []
 
-    argv = sys.argv
-    if len(argv) < 2:
-        print('  Need directory path included images.\n')
-
-        print('Usage:')
-        print('  * python convert2jpg.py <directory path>\n')
-
-        print('Example:')
-        print('  * python convert2jpg.py datasets/Images/001/')
-        exit(-1)
-
     dir_path = Path(argv[1])
     if not dir_path.exists():
         print('  This directory is not exist.')
 
     imgs = dir_path.glob('*')
-    for img in imgs:
+    for i, img in enumerate(imgs):
+        print(f'\r{i}', end='')
+
         p = Path(img)
+
+        if p.is_dir():
+            continue
 
         name = p.stem
         ext = p.suffix
@@ -83,11 +87,12 @@ if __name__ == "__main__":
         # encode
         if ext in encode_exts:
             # convert
-            st = convert_extension(str(p), target_ext)
+            # st = convert_extension(str(p), target_ext)
 
-            # success
-            if st == 0:
-                path_list.append(p)
+            # # success
+            # if st == 0:
+            #     path_list.append(p)
+            pass
 
     # is not exist target files
     if len(path_list) == 0:

@@ -1,22 +1,18 @@
 import sys
 import os
 import random
-from os import walk, getcwd
 from PIL import Image
+from pathlib import Path
 
 import utils.utils as ul
 
 classes = []
+all_list = []
 is_show = False
 
 
 def create_config(data_dir, train_ratio):
-    all_list = []
-    for cls in classes:
-        with open(f'{data_dir}/config/{cls}_list.txt', 'r') as f:
-            for file_name in f.readlines():
-                if not (file_name in all_list):
-                    all_list.append(file_name)
+    cfg_path = Path(data_dir, 'config')
 
     if train_ratio > 0:
         random.shuffle(all_list)
@@ -27,27 +23,36 @@ def create_config(data_dir, train_ratio):
         train_list = all_list
         valid_list = all_list
 
-    with open(f'{data_dir}/config/train.txt', 'w') as train_list_file:
+    # train
+    path = cfg_path.joinpath('train.txt')
+    with open(path, 'w') as train_list_file:
         for file_name in train_list:
-            train_list_file.write(file_name)
+            train_list_file.write(file_name + '\n')
 
-    with open(f'{data_dir}/config/valid.txt', 'w') as valid_list_file:
+    # valid
+    path = cfg_path.joinpath('valid.txt')
+    with open(path, 'w') as valid_list_file:
         for file_name in valid_list:
-            valid_list_file.write(file_name)
+            valid_list_file.write(file_name + '\n')
 
-    with open(f'{data_dir}/config/learning.data', 'w') as data_config:
-        class_num = len(classes)
-        data_config.write(f'classes = {class_num}\n')
-        data_config.write(f'train = {data_dir}/config/train.txt\n')
-        data_config.write(f'valid = {data_dir}/config/valid.txt\n')
-        data_config.write(f'names = {data_dir}/config/learning.names\n')
+    # data
+    path = cfg_path.joinpath('learning.data')
+    with open(path, 'w') as data_config:
+        size = len(classes)
+        pp = cfg_path.as_posix()  # convert (\ -> /)
+
+        data_config.write(f'classes = {size}\n')
+        data_config.write(f'train = {pp}/train.txt\n')
+        data_config.write(f'valid = {pp}/valid.txt\n')
+        data_config.write(f'names = {pp}/learning.names\n')
         data_config.write('backup = backup\n')
 
-        backup_path = f'{data_dir}/config/backup'
-        if not os.path.exists(backup_path):
-            os.makedirs(backup_path)
+        backup_path = cfg_path.joinpath('backup')
+        backup_path.mkdir(parents=True, exist_ok=True)
 
-    with open(f'{data_dir}/config/learning.names', 'w') as names_config:
+    # names (classes)
+    path = cfg_path.joinpath('learning.names')
+    with open(path, 'w') as names_config:
         for cls in classes:
             names_config.write(f'{cls}\n')
 
@@ -84,105 +89,105 @@ def convert(size, box):
 
 def main(data_dir, obj_dir):
     is_inflated = True  # inflated-imagesを実行したかどうか
-    seq = 1  # フォルダ連番用
     image_dir = obj_dir
     label_dir = 'inflated_labels'
 
+    data_path = Path(data_dir)
+
     # for is_show == false
     counter = 1
-    all_counter = 1
 
-    if not os.path.exists(f'{data_dir}/{label_dir}'):
+    path = Path(data_dir, label_dir)
+    if not path.exists():
         is_inflated = False
         label_dir = 'Labels'
         image_dir = 'Images'
+        path = Path(data_dir, label_dir)
+
+    dirs = [x.name for x in path.glob('*') if x.is_dir()]
 
     # 分類クラス分繰り返す
-    for cls in classes:
-        seq_fill = str(seq).zfill(3)
-        target_dir = cls if is_inflated else seq_fill
-
-        label_path = f'{data_dir}/{label_dir}/{target_dir}'
+    for cls, _dir in zip(classes, dirs):
+        target_dir = cls if is_inflated else _dir
 
         # {cls}フォルダが存在しないなら作成
-        cls_dir = f'{data_dir}/{obj_dir}/{cls}'
-        if not os.path.exists(cls_dir):
-            os.makedirs(cls_dir)
+        cls_path = data_path.joinpath(obj_dir, cls)
+        cls_path.mkdir(parents=True, exist_ok=True)
 
-        wd = getcwd()
         cls_id = classes.index(cls)
 
         # configフォルダを作成
-        conf_dir = f'{data_dir}/config'
-        if not os.path.exists(conf_dir):
-            os.makedirs(conf_dir)
+        cfg_path = data_path.joinpath('config')
+        cfg_path.mkdir(parents=True, exist_ok=True)
 
-        # outputファイルのpathが列挙されるリストファイル
-        list_file = open(f'{wd}/{data_dir}/config/{cls}_list.txt', 'w')
+        label_path = data_path.joinpath(label_dir, target_dir)
 
         # input ファイル名を取得
         txt_name_list = []
-        for (_, _, filenames) in walk(label_path):
-            txt_name_list.extend(filenames)
+        for fp in label_path.glob('*'):
+            txt_name_list.append(fp.name)
 
         if is_show:
             print(f'txt_name_list = {txt_name_list}')
 
-        all_counter = len(txt_name_list)
-
-        out_path = os.path.join(data_dir, image_dir, target_dir)
+        img_base_path = Path(data_dir, image_dir, target_dir)
 
         # input ファイル数分変換処理
         for txt_name in txt_name_list:
-
             # inputファイルを読み込み、行に分割
             lines = None
-            with open(f'{label_path}/{txt_name}', 'r') as txt_file:
-                lines = txt_file.read().replace('\r\n', '\n').split('\n')
+            txt_file = label_path.joinpath(txt_name)
+            with open(txt_file) as f:
+                lines = f.read().replace('\r\n', '\n').split('\n')
 
             # outputファイル作成
-            # txt_outfile = open(f'{cls_dir}/{txt_name}', 'w')
-            with open(f'{cls_dir}/{txt_name}', 'w') as f:
-                fname = os.path.splitext(txt_name)[0]
-                img_path = os.path.join(out_path, f'{fname}.jpg')
-                # img_path = f'{data_dir}/{image_dir}/{target_dir}/{fname}.jpg'
+            fname = Path(txt_file).stem + '.jpg'
+            txt_save_path = cls_path.joinpath(txt_name)
+            img_save_path = cls_path.joinpath(fname)
 
-                im = Image.open(img_path)
-                w = int(im.size[0])
-                h = int(im.size[1])
+            img_path = img_base_path.joinpath(fname)
+            img = Image.open(img_path)
+            w = int(img.size[0])
+            h = int(img.size[1])
 
-                ct = 0
-                for line in lines:
-                    if len(line) < 4:
-                        continue
+            # save to {obj_dir}
+            if not img_save_path.exists():
+                img.save(str(img_save_path))
 
-                    ct += 1
-                    elems = line.split(' ')
+            is_convert = False
+            content = []
+            for line in lines:
+                elems = line.split(' ')
+                if len(elems) != 4:
+                    continue
 
-                    if is_show:
-                        print(line + '\n')
-                        print(elems)
+                is_convert = True
+                if is_show:
+                    print(line + '\n')
+                    print(elems)
 
-                    xmin = float(elems[0])
-                    xmax = float(elems[2])
-                    ymin = float(elems[1])
-                    ymax = float(elems[3])
+                # xmin = float(elems[0])
+                # xmax = float(elems[2])
+                # ymin = float(elems[1])
+                # ymax = float(elems[3])
+                # b = (xmin, xmax, ymin, ymax)
 
-                    b = (xmin, xmax, ymin, ymax)
-                    bb = convert((w, h), b)
-                    f.write(f'{cls_id} %s\n' % ' '.join([str(a) for a in bb]))
-            # txt_outfile.close()
+                b = tuple([float(x) for x in elems])
+                bb = convert((w, h), b)
+
+                xx = ' '.join([str(a) for a in bb])
+                content.append(f'{cls_id} {xx}\n')
+
+            with open(txt_save_path, 'w') as f:
+                f.writelines(content)
+
+            if is_convert:
+                all_list.append(img_save_path.as_posix())
 
             if not is_show:
-                print(f'\r * %-10s: {counter} / {all_counter}' % cls, end='')
+                all_size = len(txt_name_list)
+                print(f'\r * %-10s: {counter} / {all_size}' % cls, end='')
                 counter += 1
-
-            if(ct != 0):
-                # write path
-                list_file.write(f'{img_path}\n')
-
-        list_file.close()
-        seq += 1  # 連番を増やす
 
         if not is_show:
             print()
@@ -206,10 +211,10 @@ if __name__ == '__main__':
         obj_dir = argv[2]
 
     # クラス名のファイルの読み込み
-    classes = [line.rstrip() for line in open(f'{data_dir}/classes.txt', 'r')]
+    classes = [line.strip() for line in open(f'{data_dir}/classes.txt', 'r')]
     print('class name = ', end='')
-    for i in classes:
-        print(i, end=' ')
+    for cls in classes:
+        print(cls, end=' ')
     print()
 
     # 学習の割合
@@ -226,9 +231,3 @@ if __name__ == '__main__':
     create_config(data_dir, train_ratio)
 
     print('\nFinished.')
-
-    # 不要なリストを削除する
-    path = os.path.join(data_dir, 'config')
-    for i in classes:
-        os.remove(os.path.join(path, f'{i}_list.txt'))
-        # subprocess.call(f'del {data_dir}\\config\\{i}_list.txt', shell=True)
