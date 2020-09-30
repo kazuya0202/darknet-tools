@@ -1,7 +1,10 @@
+import re
+import sys
 import urllib
 import urllib.request
+from dataclasses import dataclass
 from pathlib import Path
-import sys
+from typing import Optional
 
 
 def find_filter_index(contents, cls_idx):
@@ -29,21 +32,23 @@ def get_cfg(cfg):
     return contents
 
 
-def main():
+def main(cfg_file: Optional[str] = "yolov4-custom.cfg"):
     # default: yolov3.cfg
-    default_cfg = 'cfg/yolov3.cfg'
+    # default_cfg = 'cfg/yolov3.cfg'
 
-    argv = sys.argv
-    if len(argv) >= 2:
-        default_cfg = argv[1]
+    if cfg_file is None:
+        cfg_file = "yolov4-custom.cfg"
 
-    cfg = Path(f'./{default_cfg}').with_suffix('.cfg')
-    if cfg.exists():
-        print(f'Get `{default_cfg}` from local.')
+    cfg_path = Path(f'./cfg/{cfg_file}').with_suffix('.cfg')
+    if cfg_path.exists():
+        print(f'Get `{cfg_file}` from local.')
     else:
-        print(f'./{default_cfg} is not exists.')
-        print(f'Get `{default_cfg}` from alexeyAB/darknet/cfg/{default_cfg}.')
+        print(f'./cfg/{cfg_file} is not exists.')
+        print(f'Get `{cfg_file}` from alexeyAB/darknet/cfg/{cfg_file}.')
     print()
+
+    target = cfg_path if cfg_path.exists() else cfg_file
+    contents = get_cfg(target)
 
     # --- parameters
     cls_path = Path(f'datasets/classes.txt')
@@ -61,48 +66,73 @@ def main():
     print()
     # --------------
 
-    target = cfg if cfg.exists() else default_cfg
-    contents = get_cfg(target)
-
     # modify
     print('--- Modified ---')
+    # -----
+    # pat = re.compile(r"\[[a-z]+\]")
+
+    # # idxs[0] => [net] / idxs[1] => [???]
+    # # idxs = [i for i, line in enumerate(contents) if pat.search(line)]
+
+    # idx = [i for i, line in enumerate(contents) if pat.search(line)][1]
+    # idx = contents.index(contents[idx])
+    # net_param, params = contents[:idx], contents[idx:]
+
+    # @dataclass
+    # class IndexValue:
+    #     index: int
+    #     value: str
+
+    # # extract `batch`, `subdivision`
+    # fd_batch = [IndexValue(i, x) for i, x in enumerate(net_param) if x.find("batch") > -1 and not x.find("max_batches") > -1]
+    # fd_subdiv = [IndexValue(i, x) for i, x in enumerate(net_param) if x.find("subdivision") > -1]
+    # print(fd_batch)
+    # print(fd_subdiv)
+
+    # for x in fd_batch:
+    #     if x.value.find("#") > -1:
+    #         pass
+
+    # net_param.extend(params)
+    # contents = net_param
 
     # batch / subdivisions
-    x_list = [
-        ['batch=', 'batch ='],
-        ['subdivisions=', 'subdivisions ='],
-        ['# batch=', '# batch =', '#batch=', '#batch ='],
-        ['# subdivisions=', '# subdivisions =', '#subdivisions=', '#subdivisions =']]
-    comment_strs = []
-    uncomment_strs = []
+    # x_list = [
+    #     ['batch=', 'batch ='],
+    #     ['subdivisions=', 'subdivisions ='],
+    #     ['# batch=', '# batch =', '#batch=', '#batch ='],
+    #     ['# subdivisions=', '# subdivisions =', '#subdivisions=', '#subdivisions =']]
+    # comment_strs = []
+    # uncomment_strs = []
 
-    n = -1
-    for xl in x_list:
-        for _ in range(len(contents) - n - 1):
-            n += 1
-            if any([contents[n].find(x) > -1 for x in xl]):
-                c = contents[n]
-                idx = c.find('#')
+    # n = -1
+    # for xl in x_list:
+    #     for _ in range(len(contents) - n - 1):
+    #         n += 1
+    #         if any([contents[n].find(idx) > -1 for idx in xl]):
+    #             c = contents[n]
+    #             idx = c.find('#')
 
-                if idx > -1:
-                    t = (c[idx + 1:].strip() + '\n')
-                    uncomment_strs.append([n, t])
-                else:
-                    t = ('# ' + c)
-                    comment_strs.append([n, t])
+    #             if idx > -1:
+    #                 t = (c[idx + 1:].strip() + '\n')
+    #                 uncomment_strs.append([n, t])
+    #             else:
+    #                 t = ('# ' + c)
+    #                 comment_strs.append([n, t])
 
-                break
+    #             break
 
-    # uncomment / comment
-    if len(comment_strs) == len(uncomment_strs):
-        for xn in comment_strs:
-            contents[xn[0]] = xn[1]
-            print(f'{xn[0]:>3}: {xn[1]}', end='')
+    # # uncomment / comment
+    # if len(comment_strs) == len(uncomment_strs):
+    #     for xn in comment_strs:
+    #         contents[xn[0]] = xn[1]
+    #         print(f'{xn[0]:>3}: {xn[1]}', end='')
 
-    for xn in uncomment_strs:
-        contents[xn[0]] = xn[1]
-        print(f'{xn[0]:>3}: {xn[1]}', end='')
+    # for xn in uncomment_strs:
+    #     contents[xn[0]] = xn[1]
+    #     print(f'{xn[0]:>3}: {xn[1]}', end='')
 
+    align_num = 5
     # classes / filters / max_batches / steps
     for n, c in enumerate(contents):
         if c.find('classes') > -1:
@@ -111,16 +141,16 @@ def main():
                 contents[n] = f'classes={classes}\n'
                 contents[idx] = f'filters={filters}\n'
 
-                print(f'{(idx + 1):>3}: {contents[idx]}', end='')
-                print(f'{(n + 1):>3}: {contents[n]}', end='')
+                print(f'{(idx + 1)}:'.rjust(align_num), f'{contents[idx]}', end='')
+                print(f'{(n + 1)}:'.rjust(align_num), f'{contents[n]}', end='')
 
         if c.find('max_batches') > -1:
             contents[n] = f'max_batches={max_batches}\n'
-            print(f'{(n + 1):>3}: {contents[n]}', end='')
+            print(f'{(n + 1)}:'.rjust(align_num), f'{contents[n]}', end='')
 
         if c.find('steps=') > -1:
             contents[n] = f'steps={steps}\n'
-            print(f'{(n + 1):>3}: {contents[n]}', end='')
+            print(f'{(n + 1)}:'.rjust(align_num), f'{contents[n]}', end='')
 
     # write
     out_cfg = Path('datasets/config/learning.cfg')
@@ -131,4 +161,9 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    cfg_file = None
+    argv = sys.argv
+    if len(argv) >= 2:
+        cfg_file = argv[1]
+
+    main(cfg_file)
