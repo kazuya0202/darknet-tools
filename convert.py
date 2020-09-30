@@ -1,9 +1,12 @@
-import sys
-import os
 import random
-from PIL import Image
+import sys
+from argparse import ArgumentParser
 from pathlib import Path
+from typing import Union
+from PIL import Image
+from sklearn.model_selection import train_test_split
 
+# my packages
 import utils.utils as ul
 
 classes = []
@@ -11,14 +14,17 @@ all_list = []
 is_show = False
 
 
-def create_config(data_dir, train_ratio):
+def create_config(data_dir: Union[str, Path], train_ratio: Union[int, float]):
     cfg_path = Path(data_dir, 'config')
 
     if train_ratio > 0:
-        random.shuffle(all_list)
-        train_num = int(train_ratio * len(all_list))
-        train_list = all_list[:train_num]
-        valid_list = all_list[train_num:]
+        train_list, valid_list = train_test_split(
+            all_list, test_size=train_ratio, shuffle=True)
+
+        # random.shuffle(all_list)
+        # train_num = int(train_ratio * len(all_list))
+        # train_list = all_list[:train_num]
+        # valid_list = all_list[train_num:]
     else:
         train_list = all_list
         valid_list = all_list
@@ -39,12 +45,12 @@ def create_config(data_dir, train_ratio):
     path = cfg_path.joinpath('learning.data')
     with open(path, 'w') as data_config:
         size = len(classes)
-        pp = cfg_path.as_posix()  # convert (\ -> /)
+        cp = cfg_path.as_posix()
 
         data_config.write(f'classes = {size}\n')
-        data_config.write(f'train = {pp}/train.txt\n')
-        data_config.write(f'valid = {pp}/valid.txt\n')
-        data_config.write(f'names = {pp}/learning.names\n')
+        data_config.write(f'train = {cp}/train.txt\n')
+        data_config.write(f'valid = {cp}/valid.txt\n')
+        data_config.write(f'names = {cp}/learning.names\n')
         data_config.write('backup = backup\n')
 
         backup_path = cfg_path.joinpath('backup')

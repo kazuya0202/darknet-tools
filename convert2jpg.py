@@ -1,5 +1,7 @@
-import ffmpeg
+import sys
 from pathlib import Path
+
+import ffmpeg
 
 
 def convert_extension(path, ext):
@@ -28,9 +30,7 @@ def convert_extension(path, ext):
     return 0
 
 
-if __name__ == "__main__":
-    import sys
-    argv = sys.argv
+def process_argv(argv: list):
     if len(argv) < 2:
         print('  Need a directory path included images.\n')
 
@@ -41,8 +41,8 @@ if __name__ == "__main__":
         print('  * python convert2jpg.py datasets/Images/001/')
         exit(-1)
 
-    target_ext = '.jpg'
 
+def main(image_path: str, target_ext: str = '.jpg'):
     encode_exts = [
         '.png', '.PNG',
         '.gif', '.GIF',
@@ -87,11 +87,11 @@ if __name__ == "__main__":
         # encode
         if ext in encode_exts:
             # convert
-            # st = convert_extension(str(p), target_ext)
+            st = convert_extension(str(p), target_ext)
 
             # # success
-            # if st == 0:
-            #     path_list.append(p)
+            if st == 0:
+                path_list.append(p)
             pass
 
     # is not exist target files
@@ -114,6 +114,19 @@ if __name__ == "__main__":
     # true / false
     is_remove = ans in ans_list
 
+    # do not remove
+    if not is_remove:
+        print('Exit without removing.')
+        exit()
+
     for path in path_list:
         path.unlink()
         print(f'deleted: {path}')
+
+
+if __name__ == "__main__":
+    argv = sys.argv
+    process_argv(argv)
+
+    path = argv[1]
+    main(path)
